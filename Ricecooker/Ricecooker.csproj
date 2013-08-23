@@ -1,0 +1,257 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C9F7B38B-FB80-4BE9-89FA-4296B339FAB6}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>mikity.ghComponents</RootNamespace>
+    <AssemblyName>Ricecooker</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="GH_IO">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Rhinoceros 4.0\Plug-ins\Grasshopper\GH_IO.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Grasshopper">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Rhinoceros 4.0\Plug-ins\Grasshopper\Grasshopper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ILNumerics">
+      <HintPath>..\packages\ILNumerics.3.2.2.0\lib\ILNumerics.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualC.STLCLR" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="PresentationFramework.Aero">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="RhinoCommon">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Rhinoceros 4.0\Plug-ins\Grasshopper\rh_common\RhinoCommon.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="3nodesNetwork.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="materials.cs" />
+    <Compile Include="isoparametricArray.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="isoparametricElement.cs" />
+    <Compile Include="GH_particleSystem.cs" />
+    <Compile Include="FriedChiken.cs" />
+    <Compile Include="constraintConditions.cs" />
+    <Compile Include="8nodesBrickElements.cs" />
+    <Compile Include="4nodesFixedNodes.cs" />
+    <Compile Include="4nodesQuadElements.cs" />
+    <Compile Include="2nodesLineElements.cs" />
+    <Compile Include="manyNodesFixedNodes.cs" />
+    <Compile Include="2nodesBar.cs" />
+    <Compile Include="2nodesTotalLength.cs" />
+    <Compile Include="meshQuadElements.cs" />
+    <Compile Include="2nodesEachLength.cs" />
+    <Compile Include="2nodesFixedNodes.cs" />
+    <Compile Include="2nodesNodalForce.cs" />
+    <Compile Include="curveEachLength.cs" />
+    <Compile Include="curveNodalForce.cs" />
+    <Compile Include="curveFixedNodes.cs" />
+    <Compile Include="surfaceQuadElements.cs" />
+    <Compile Include="curveLineElements.cs" />
+    <Compile Include="polylineLineElements.cs" />
+    <Compile Include="nodePairsLineElements.cs" />
+    <Compile Include="nodePairsBars.cs" />
+    <Compile Include="polylineTotalLength.cs" />
+    <Compile Include="polylineNodalForce.cs" />
+    <Compile Include="polylineEachLength.cs" />
+    <Compile Include="meshNodalForces.cs" />
+    <Compile Include="surfaceNodalForces.cs" />
+    <Compile Include="4nodesNodalForces.cs" />
+    <Compile Include="8nodesNodalForces.cs" />
+    <Compile Include="gravity.cs" />
+    <Compile Include="nodePairsFixedNodes.cs" />
+    <Compile Include="4nodesNetwork.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FriedChikenLinAlg\mikityLinearAlgebra.csproj">
+      <Project>{35A8E238-9BB3-4EEF-A1F3-0E4C38C4C6C3}</Project>
+      <Name>mikityLinearAlgebra</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FriedChikenNumMeth\mikityNumMeth.csproj">
+      <Project>{05AE55E7-42EC-4E7B-A384-0F4C40398077}</Project>
+      <Name>mikityNumMeth</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FriedChikenUtil\mikityMathUtil.csproj">
+      <Project>{8691E87D-988D-450C-A566-8D40254F0E6E}</Project>
+      <Name>mikityMathUtil</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FriedChiken\mikityExceptions.csproj">
+      <Project>{AA6306F4-3089-4012-97E1-F48289690754}</Project>
+      <Name>mikityExceptions</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\icon29.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\icon46.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\two-nodes-bar.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\fF.bmp" />
+    <EmbeddedResource Include="icons\neoH.bmp" />
+    <EmbeddedResource Include="icons\stV.bmp" />
+    <EmbeddedResource Include="icons\mR.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\two-nodes-each_length.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\two-nodes-total_length.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\node-pairs-rigid-bars.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\curve-total_length.bmp" />
+    <EmbeddedResource Include="icons\polyline-total_length.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\curve-each_length.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\polyline-each_length.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\two-nodes-fixed_nodes.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\four-nodes-fixed_nodes.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\many-nodes-fixed_nodes.bmp" />
+    <EmbeddedResource Include="icons\node-pairs-fixed_nodes.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\eight-nodes-nodal-force.bmp" />
+    <EmbeddedResource Include="icons\four-nodes-nodal-force.bmp" />
+    <EmbeddedResource Include="icons\two-nodes-nodal_force.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\two-nodes-line_elements.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\four-nodes-quad_elements.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\eight-nodes-quad_elements.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\node_pairs-line_elements.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\formfindGravity.bmp" />
+    <EmbeddedResource Include="icons\normalGravity.bmp" />
+    <EmbeddedResource Include="icons\zeroGravity.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\polyline-line-elements.bmp" />
+    <EmbeddedResource Include="icons\polyline-nodal-forces.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\curve-fixed_nodes.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\curve-line_elements.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\curve-nodal_forces.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\mesh-nodal_forces.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\mesh-quad_elements.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="icons\surface-nodal_forces.bmp" />
+    <EmbeddedResource Include="icons\surface-quad_elements.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin32\libiomp5md.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="bin32\mkl_custom.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="bin64\libiomp5md.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="bin64\mkl_custom.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>ILMerge /out:$(ProjectName)Support.dll /wildcards Ricecooker.dll mikity*.dll
+
+Erase "$(TargetDir)\mikity*.dll"
+Copy "$(TargetDir)\RicecookerGUI.dll" "$(TargetDir)\merge\RicecookerGUI.dll"
+
+Copy "$(TargetDir)\$(ProjectName)Support.dll" "$(TargetDir)\merge\$(ProjectName).gha"
+Copy "$(TargetDir)\Presentation*.dll" "$(TargetDir)\merge\Presentation*.dll"
+Copy "$(TargetDir)\EigenSharp.dll" "$(TargetDir)\merge\EigenSharp.dll"
+Copy "$(TargetDir)\System.Reactive.dll" "$(TargetDir)\merge\System.Reactive.dll"
+Copy  "$(TargetDir)\merge\$(ProjectName).gha" "C:\Users\$(Username)\AppData\Roaming\Grasshopper\Libraries\
+Copy  "$(TargetDir)\merge\*.dll" "C:\Users\$(Username)\AppData\Roaming\Grasshopper\Libraries\</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
