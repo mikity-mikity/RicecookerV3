@@ -46,8 +46,8 @@
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Rhinoceros 4.0\Plug-ins\Grasshopper\Grasshopper.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ILNumerics">
-      <HintPath>..\packages\ILNumerics.3.2.2.0\lib\ILNumerics.dll</HintPath>
+    <Reference Include="MatrixInterf, Version=2.0.5.0, Culture=neutral, PublicKeyToken=1fa71b5ffec10e32, processorArchitecture=MSIL">
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualC.STLCLR" />
     <Reference Include="PresentationCore" />
@@ -61,6 +61,9 @@
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Rhinoceros 4.0\Plug-ins\Grasshopper\rh_common\RhinoCommon.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ShoArray, Version=2.0.5.0, Culture=neutral, PublicKeyToken=1635376d5e62ab5f, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Data" />
@@ -72,8 +75,10 @@
     <Compile Include="3nodesNetwork.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="KeyboardHook.cs" />
     <Compile Include="materials.cs" />
     <Compile Include="isoparametricArray.cs" />
+    <Compile Include="MouseHook.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="isoparametricElement.cs" />
     <Compile Include="GH_particleSystem.cs" />
@@ -235,15 +240,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>ILMerge /out:$(ProjectName)Support.dll /wildcards Ricecooker.dll mikity*.dll
-
+    <PostBuildEvent>ILMerge /out:$(ProjectName)Support.dll /lib:C:\Windows\Microsoft.NET\Framework\v4.0.30319 /wildcards $(ProjectName).dll mikity*.dll
 Erase "$(TargetDir)\mikity*.dll"
-Copy "$(TargetDir)\RicecookerGUI.dll" "$(TargetDir)\merge\RicecookerGUI.dll"
-
 Copy "$(TargetDir)\$(ProjectName)Support.dll" "$(TargetDir)\merge\$(ProjectName).gha"
+
 Copy "$(TargetDir)\Presentation*.dll" "$(TargetDir)\merge\Presentation*.dll"
-Copy "$(TargetDir)\EigenSharp.dll" "$(TargetDir)\merge\EigenSharp.dll"
-Copy "$(TargetDir)\System.Reactive.dll" "$(TargetDir)\merge\System.Reactive.dll"
 Copy  "$(TargetDir)\merge\$(ProjectName).gha" "C:\Users\$(Username)\AppData\Roaming\Grasshopper\Libraries\
 Copy  "$(TargetDir)\merge\*.dll" "C:\Users\$(Username)\AppData\Roaming\Grasshopper\Libraries\</PostBuildEvent>
   </PropertyGroup>

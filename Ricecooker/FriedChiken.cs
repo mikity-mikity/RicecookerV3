@@ -32,7 +32,68 @@ namespace mikity.ghComponents
         public GH_FriedChikenMainLoop()
             : base("MainLoop", "MainLoop", "MainLoop", "Ricecooker", "Computation")
         {
-        }       
+        }
+        ~GH_FriedChikenMainLoop()
+        {
+            keyboardHook.Uninstall();
+        }
+        RamGecTools.MouseHook mouseHook = new RamGecTools.MouseHook();
+        RamGecTools.KeyboardHook keyboardHook = new RamGecTools.KeyboardHook();
+        void keyboardHook_KeyUp(RamGecTools.KeyboardHook.VKeys key)
+        {
+            if (key == RamGecTools.KeyboardHook.VKeys.ESCAPE)
+            {
+                _go = false;
+                t = 0;
+                timer.Enabled = false;
+                ExpireSolution(true);
+            }
+            if (key == RamGecTools.KeyboardHook.VKeys.SPACE)
+            {
+                if (_go)
+                {
+                    _go = false;
+//                    t = 0;
+                    timer.Enabled = false;
+                }
+                else
+                {
+                    _go = true;
+                    t = 0;
+                    timer.Enabled = true;
+                }
+            }
+        }
+
+        void keyboardHook_KeyDown(RamGecTools.KeyboardHook.VKeys key)
+        {
+
+            //keyboardKeyPress.BackColor = Color.IndianRed;
+            //keyboardLog.Text = "[" + DateTime.Now.ToLongTimeString() + "] KeyDown Event {" + key.ToString() + "}" + Environment.NewLine + keyboardLog.Text;
+        }
+        void timer_Tick(object sender, EventArgs e)
+        {
+            this.ExpireSolution(true);
+        }
+        System.Windows.Forms.Timer timer;
+        public override void AddedToDocument(Grasshopper.Kernel.GH_Document document)
+        {
+            base.AddedToDocument(document);
+            //Rhino.RhinoDoc.ReplaceRhinoObject += RhinoDoc_ReplaceRhinoObject;
+            timer = new System.Windows.Forms.Timer();
+            timer.Tick += timer_Tick;
+            timer.Enabled = false;
+            timer.Interval = 1;
+
+            // register evens
+            keyboardHook.KeyDown += new RamGecTools.KeyboardHook.KeyboardHookCallback(keyboardHook_KeyDown);
+            keyboardHook.KeyUp += new RamGecTools.KeyboardHook.KeyboardHookCallback(keyboardHook_KeyUp);
+
+            keyboardHook.Install();
+
+
+        }
+
         protected override void RegisterInputParams(Grasshopper.Kernel.GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("ParticleSystems", "pS", "ParticleSystems", Grasshopper.Kernel.GH_ParamAccess.list);
@@ -83,7 +144,7 @@ namespace mikity.ghComponents
             base.DrawViewportWires(args);
         }
 
-        System.Windows.Forms.ToolStripMenuItem __m1,__m2,__m3;
+        System.Windows.Forms.ToolStripMenuItem __m1,__m2;
 
         public override void AppendAdditionalMenuItems(System.Windows.Forms.ToolStripDropDown menu)
         {
@@ -91,7 +152,7 @@ namespace mikity.ghComponents
             Menu_AppendSeparator(menu);
             __m1 = Menu_AppendItem(menu, "Normalize?", Menu_MyCustomItemClicked);
             __m2 = Menu_AppendItem(menu, "Geodesic?", Menu_MyCustomItemClicked);
-            __m3 = Menu_AppendItem(menu, "Go!", Menu_MyCustomItemClicked);
+//            __m3 = Menu_AppendItem(menu, "Go!", Menu_MyCustomItemClicked);
             
             if (_normalize == true)
             {
@@ -109,7 +170,7 @@ namespace mikity.ghComponents
             {
                 __m2.CheckState = System.Windows.Forms.CheckState.Unchecked;
             }
-            if (_go == true)
+/*            if (_go == true)
             {
                 __m3.CheckState = System.Windows.Forms.CheckState.Checked;
             }
@@ -117,7 +178,7 @@ namespace mikity.ghComponents
             {
                 __m3.CheckState = System.Windows.Forms.CheckState.Unchecked;
                 t = 0;
-            }
+            }*/
         }
         private bool _go = false;
         private bool _normalize = true;
@@ -152,7 +213,7 @@ namespace mikity.ghComponents
                     _geodesic = true;
                 }
             }
-            if (__m == __m3)
+/*            if (__m == __m3)
             {
                 if (__m.CheckState == System.Windows.Forms.CheckState.Checked)
                 {
@@ -165,7 +226,7 @@ namespace mikity.ghComponents
                     __m.CheckState = System.Windows.Forms.CheckState.Checked;
                     _go = true;
                 }
-            }
+            }*/
         }
         public override bool Read(GH_IO.Serialization.GH_IReader reader)
         {
@@ -292,14 +353,14 @@ namespace mikity.ghComponents
                 FriedChiken.Tack(t);//マスク等後処理
                 if (FriedChiken.numCond > 0)
                 {
-                    ILNumerics.ILArray<double> jacob = FriedChiken.getJacobian().rawData;
-                    ILNumerics.ILArray<double> omega = FriedChiken.omega.rawData;
-                    ILNumerics.ILRetArray<double> z = ILNumerics.ILMath.linsolve(jacob, omega);
-                    double[]_lambda=lambda.rawData;
-                    z.ExportValues(ref _lambda);
-                    //EigenSharp.Solver.pinv(FriedChiken.omega, FriedChiken.getJacobian(), lambda);
-//                    nACML.Solver.pinv(FriedChiken.omega, FriedChiken.getJacobian(), lambda);
-
+                    var jacob = ShoNS.Array.DoubleArray.From(FriedChiken.getJacobian().rawData);
+                    var omega = ShoNS.Array.DoubleArray.From(FriedChiken.omega.rawData);
+                    jacob = jacob.T;
+                    omega = omega.T;
+                    var solver = new ShoNS.Array.Solver(jacob);
+                    var _lambda=solver.Solve(omega);
+                    _lambda.CopyTo(lambda, 0);
+                    
                     FriedChiken.omega.xminusyA(FriedChiken.omega, lambda, FriedChiken.getJacobian());
                 }
                 string tmp="\t"+t.ToString()+"\t";
@@ -319,15 +380,12 @@ namespace mikity.ghComponents
                     if (FriedChiken.numCond > 0)
                     {
                         matrix.y_equals_Ax(FriedChiken.getJacobian(), FriedChiken.q, qr);
-                        ILNumerics.ILArray<double> jacob = FriedChiken.getJacobian().rawData;
-                        jacob=jacob.T;
-                        ILNumerics.ILArray<double> _qr = qr.rawData;
-                        ILNumerics.ILRetArray<double> z = ILNumerics.ILMath.linsolve(jacob, _qr);
+                        var jacob = ShoNS.Array.DoubleArray.From(FriedChiken.getJacobian().rawData);
+                        var _qr = ShoNS.Array.DoubleArray.From(qr.rawData).T;
+                        var solve = new ShoNS.Array.Solver(jacob);
+                        var z=solve.Solve(_qr);
                         double[] _qo = qo.rawData;
-                        z.ExportValues(ref _qo);
-
-                        //                        EigenSharp.Solver.pinv(FriedChiken.getJacobian(), qr, qo);
-//                        nACML.Solver.pinv(FriedChiken.getJacobian(), qr, qo);
+                        z.CopyTo(_qo, 0);
                         FriedChiken.q.Subtract(qo);
                     }
                 }
@@ -340,16 +398,11 @@ namespace mikity.ghComponents
 
                     for (__s = 0; __s < 50; __s++)
                     {
-                        ILNumerics.ILInArray<double> f = FriedChiken.getJacobian().rawData;
-                        f = f.T;
-                        ILNumerics.ILInArray<double> g = ILNumerics.ILMath.array<double>(FriedChiken.getResidual().rawData, FriedChiken.numCond);
-
-                        ILNumerics.ILRetArray<double> h = ILNumerics.ILMath.linsolve(f, g);
-                        double[] _dx = dx.rawData;
-                        h.ExportValues(ref _dx);
-
-//                        EigenSharp.Solver.pinv(FriedChiken.getJacobian(), FriedChiken.getResidual(), dx);
-//                        nACML.Solver.pinv(FriedChiken.getJacobian(), FriedChiken.getResidual(), dx);
+                        var f = ShoNS.Array.DoubleArray.From(FriedChiken.getJacobian().rawData);
+                        var g = ShoNS.Array.DoubleArray.From(FriedChiken.getResidual().rawData).T;
+                        var solver = new ShoNS.Array.Solver(f);
+                        var _dx=solver.Solve(g);
+                        _dx.CopyTo(dx.rawData, 0);
                         FriedChiken.x.Subtract(1.0,dx);
                         FriedChiken.Tick(t);//要素アップデート、勾配の計算
                         FriedChiken.Tack(t);//マスク等後処理

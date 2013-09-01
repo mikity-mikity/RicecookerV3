@@ -4,8 +4,7 @@ using System.Linq;
 using System.Text;
 using mikity.LinearAlgebra;
 using System.Threading;
-using System.Reactive.Linq;
-using System.Reactive;
+using System.Threading.Tasks;
 using mikity.NumericalMethodHelper.materials;
 namespace mikity.NumericalMethodHelper.objects
 {
@@ -128,43 +127,15 @@ namespace mikity.NumericalMethodHelper.objects
         {
             vector grad = FriedChiken.getGradient();
             vector load = FriedChiken.getLoad();
-            var method1 = Observable.Start(() =>
-            {
-                for (int i = 0; i < (int)elemList.Count/4; i++)
+//            var method1 = Observable.Start(() =>
+//            {
+            System.Threading.Tasks.Parallel.For(0,elemList.Count,(i)=>
                 {
                     elements.element e = elemList[i];
                     e.copyFrom(pS.particles);
                     e.Update();
                 }
-            });
-            var method2 = Observable.Start(() =>
-            {
-                for (int i = (int)elemList.Count / 4; i < (int)elemList.Count / 2; i++)
-                {
-                    elements.element e = elemList[i];
-                    e.copyFrom(pS.particles);
-                    e.Update();
-                }
-            });
-            var method3 = Observable.Start(() =>
-            {
-                for (int i = (int)elemList.Count / 2; i < (int)(elemList.Count * 3) / 4; i++)
-                {
-                    elements.element e = elemList[i];
-                    e.copyFrom(pS.particles);
-                    e.Update();
-                }
-            });
-            var method4 = Observable.Start(() =>
-            {
-                for (int i = (int)(elemList.Count * 3) / 4; i < (int)elemList.Count; i++)
-                {
-                    elements.element e = elemList[i];
-                    e.copyFrom(pS.particles);
-                    e.Update();
-                }
-            });
-            Observable.ForkJoin(method1, method2, method3, method4).First();
+            );
 
             for (int i = 0; i < elemList.Count; i++)
             {

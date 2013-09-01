@@ -39,9 +39,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Reactive">
-      <HintPath>..\packages\Rx_Experimental-Main.1.1.11111\lib\Net35\System.Reactive.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
