@@ -8,11 +8,16 @@ using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
 using mikity.NumericalMethodHelper;
 using mikity.NumericalMethodHelper.elements;
+using ShoNS.Array;
 namespace mikity.ghComponents
 {
 
     public class GH_FriedChikenMainLoop : Grasshopper.Kernel.GH_Component
     {
+        Func<double, double> Drift0 = (v) => { return 0.98; };
+        Func<double, double> Drift1 = (v) => { /*if (v > 0)*/ return v / 20d + 0.95; /*else return 0.95;*/ };
+        Func<double, double> Drift2 = (v) => { if (v > -0.001)return 1.0; else return 0.0; };
+        mikity.visualize.fullScreen full;
         protected override System.Drawing.Bitmap Icon
         {
             get
@@ -37,59 +42,173 @@ namespace mikity.ghComponents
         {
             keyboardHook.Uninstall();
         }
+        public override void DocumentContextChanged(Grasshopper.Kernel.GH_Document document, Grasshopper.Kernel.GH_DocumentContext context)
+        {
+            base.DocumentContextChanged(document, context);
+            if (context == Grasshopper.Kernel.GH_DocumentContext.Loaded)
+            {
+                //Rhino.RhinoDoc.ReplaceRhinoObject += RhinoDoc_ReplaceRhinoObject;
+                timer = new System.Windows.Forms.Timer();
+                timer.Tick += timer_Tick;
+                timer.Enabled = false;
+                timer.Interval = 1;
+
+                // register evens
+                keyboardHook.KeyDown += new RamGecTools.KeyboardHook.KeyboardHookCallback(keyboardHook_KeyDown);
+                keyboardHook.KeyUp += new RamGecTools.KeyboardHook.KeyboardHookCallback(keyboardHook_KeyUp);
+                keyboardHook._activate = new RamGecTools.KeyboardHook.activate(activate);
+                keyboardHook._deactivate = new RamGecTools.KeyboardHook.deactivate(deactivate);
+            
+                keyboardHook.Install();
+                full = new mikity.visualize.fullScreen();
+                full.deactivate();
+                full.Show();
+                full.resetGo();
+                full.drift1();
+                full.renewPlot(Drift1);
+                full.onRF();
+                
+            }
+            if (context == Grasshopper.Kernel.GH_DocumentContext.Unloaded)
+            {
+
+                keyboardHook.Uninstall();
+                keyboardHook.KeyDown -= new RamGecTools.KeyboardHook.KeyboardHookCallback(keyboardHook_KeyDown);
+                keyboardHook.KeyUp -= new RamGecTools.KeyboardHook.KeyboardHookCallback(keyboardHook_KeyUp);
+                if (full != null)
+                {
+                    full.Close();
+                    full = null;
+                }
+            }
+        }
+        void activate()
+        {
+            full.activate();
+        }
+        void deactivate()
+        {
+            full.deactivate();
+        }
+       
         RamGecTools.MouseHook mouseHook = new RamGecTools.MouseHook();
         RamGecTools.KeyboardHook keyboardHook = new RamGecTools.KeyboardHook();
-        void keyboardHook_KeyUp(RamGecTools.KeyboardHook.VKeys key)
-        {
+        bool keyboardHook_KeyUp(RamGecTools.KeyboardHook.VKeys key)
+        {            
+            if (key == RamGecTools.KeyboardHook.VKeys.KEY_R)
+            {
+                if (_RP)
+                {
+                    _RP = false;
+                    full.offRF();
+                }
+                else
+                {
+                    _RP = true;
+                    full.onRF();
+                }
+                return true;
+            }
+            
+            if (key == RamGecTools.KeyboardHook.VKeys.KEY_A)
+            {
+                if (_drift1)
+                {
+                    _drift1 = false;
+                    _drift2 = true;
+                    full.drift2();
+                    full.renewPlot(Drift2);
+                }
+                else if (_drift2)
+                {
+                    _drift1 = false;
+                    _drift2 = false;
+                    full.drift0();
+                    full.renewPlot(Drift0);
+                }
+                else
+                {
+                    _drift1 = true;
+                    _drift2 = false;
+                    full.drift1();
+                    full.renewPlot(Drift1);
+                }
+                return true;
+            }
+
+
             if (key == RamGecTools.KeyboardHook.VKeys.ESCAPE)
             {
+                full.resetGo();
                 _go = false;
-                t = 0;
                 timer.Enabled = false;
+                if (t!=0&&refX != null)
+                {
+                    t = 0;
+                    for (int i = 0; i < FriedChiken.x.rawData.Length; i++)
+                    {
+                        FriedChiken.x.rawData[i] = refX[i];
+                    }
+                    FriedChiken.Tick(t);//要素アップデート、勾配の計算
+                    FriedChiken.Tack(t);//マスク等後処理
+                    refX = null;
+                }
                 ExpireSolution(true);
+                return true;
             }
-            if (key == RamGecTools.KeyboardHook.VKeys.SPACE)
+            if (key == RamGecTools.KeyboardHook.VKeys.KEY_G)
             {
                 if (_go)
                 {
+                    full.pauseGo();
+
                     _go = false;
-//                    t = 0;
                     timer.Enabled = false;
                 }
                 else
                 {
+                    full.onGo();
+
                     _go = true;
-                    t = 0;
                     timer.Enabled = true;
                 }
+                return true;
             }
+            return false;
         }
 
-        void keyboardHook_KeyDown(RamGecTools.KeyboardHook.VKeys key)
+        bool keyboardHook_KeyDown(RamGecTools.KeyboardHook.VKeys key)
         {
+            if (key == RamGecTools.KeyboardHook.VKeys.KEY_R)
+            {
+                return true;
+            }
 
-            //keyboardKeyPress.BackColor = Color.IndianRed;
-            //keyboardLog.Text = "[" + DateTime.Now.ToLongTimeString() + "] KeyDown Event {" + key.ToString() + "}" + Environment.NewLine + keyboardLog.Text;
+            if (key == RamGecTools.KeyboardHook.VKeys.KEY_A)
+            {
+                return true;
+            }
+            if (key == RamGecTools.KeyboardHook.VKeys.ESCAPE)
+            {
+                return true;
+            }
+            if (key == RamGecTools.KeyboardHook.VKeys.KEY_G)
+            {
+                return true;
+            }
+            return false;
         }
         void timer_Tick(object sender, EventArgs e)
         {
             this.ExpireSolution(true);
         }
+        
         System.Windows.Forms.Timer timer;
+        
         public override void AddedToDocument(Grasshopper.Kernel.GH_Document document)
         {
+            
             base.AddedToDocument(document);
-            //Rhino.RhinoDoc.ReplaceRhinoObject += RhinoDoc_ReplaceRhinoObject;
-            timer = new System.Windows.Forms.Timer();
-            timer.Tick += timer_Tick;
-            timer.Enabled = false;
-            timer.Interval = 1;
-
-            // register evens
-            keyboardHook.KeyDown += new RamGecTools.KeyboardHook.KeyboardHookCallback(keyboardHook_KeyDown);
-            keyboardHook.KeyUp += new RamGecTools.KeyboardHook.KeyboardHookCallback(keyboardHook_KeyUp);
-
-            keyboardHook.Install();
 
 
         }
@@ -97,15 +216,10 @@ namespace mikity.ghComponents
         protected override void RegisterInputParams(Grasshopper.Kernel.GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("ParticleSystems", "pS", "ParticleSystems", Grasshopper.Kernel.GH_ParamAccess.list);
-            pManager.AddNumberParameter("Mass", "Mass", "Mass of one particle", Grasshopper.Kernel.GH_ParamAccess.item,1.0);
-            pManager.AddNumberParameter("Speed", "dt", "Big dt may cause trouble!", Grasshopper.Kernel.GH_ParamAccess.item);
             pManager.AddNumberParameter("Distance", "D", "Distance from the original model", Grasshopper.Kernel.GH_ParamAccess.item, 10.0);
         }
         protected override void RegisterOutputParams(Grasshopper.Kernel.GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter("Geometry", "Geom", "Geometry", Grasshopper.Kernel.GH_ParamAccess.list);
-
-            pManager.AddTextParameter("Elapsed", "dbg", "Elapsed Time", Grasshopper.Kernel.GH_ParamAccess.item);
         }
         public override void BakeGeometry(Rhino.RhinoDoc doc, Rhino.DocObjects.ObjectAttributes att, List<Guid> obj_ids)
         {
@@ -125,6 +239,7 @@ namespace mikity.ghComponents
             }
             base.BakeGeometry(doc, att, obj_ids);
         }
+
         public override void DrawViewportWires(Grasshopper.Kernel.IGH_PreviewArgs args)
         {
             if (lpS != null)
@@ -181,6 +296,7 @@ namespace mikity.ghComponents
             }*/
         }
         private bool _go = false;
+        private bool _drift1 = true, _drift2 = false,_RP=true;
         private bool _normalize = true;
         private bool _geodesic = true;
         List<string> output;
@@ -255,17 +371,20 @@ namespace mikity.ghComponents
         static double __dist = 0;
         vector lambda, qr, qo,dx;
         List<GH_particleSystem> lpS = null;
+        DoubleArray refX = null;
         protected override void SolveInstance(Grasshopper.Kernel.IGH_DataAccess DA)
         {
             stw.Stop();
             string dbg = stw.ElapsedMilliseconds.ToString();
             stw.Reset();
             double dist = 0;
-            if (!DA.GetData(3, ref dist)) return;
+            if (!DA.GetData(1, ref dist)) return;
             if (_go == false)
             {
-                FriedChiken.clear();
                 t = 0;
+                FriedChiken.clear();
+                lpS = new List<GH_particleSystem>();
+
                 if (fixedPointsGuids != null)
                 {
                     foreach (Guid[] gs in fixedPointsGuids)
@@ -278,18 +397,40 @@ namespace mikity.ghComponents
                     fixedPointsGuids = null;
                 }
 
+                if (!DA.GetDataList(0, lpS)) return;
+                particleSystem[] _ps = null;
+                _ps = new particleSystem[lpS.Count];
+                for (int i = 0; i < lpS.Count; i++)
+                {
+                    _ps[i] = lpS[i].Value;
+                }
+                FriedChiken.addParticleSystems(_ps);
+                //FriedChiken.begin();
+                __dist = dist;
+                lS = new List<Rhino.Geometry.GeometryBase>();
+                lPC = new List<Rhino.Geometry.PointCloud>();
+
+                lfN = new List<NumericalMethodHelper.objects.fixedNodes>();
+                fixedPointsGuids=new List<Guid[]>();
+
+                foreach (GH_particleSystem pS in lpS)
+                {
+                    if (pS != null)
+                    {
+                        if (pS.UPGR != null)
+                        {
+                            pS.UPGR(dist, 0, 0);
+                        }
+                    }
+                }
             }
             else
             {
-                double _dt = 0;
-                double Mass = 0;
-                if (!DA.GetData(1, ref Mass)) return;
-                if (Mass < 1.0) Mass = 1.0;
-                if (!DA.GetData(2, ref _dt)) return;
-                double dt = Math.Pow(10, ((double)_dt / 10) - 4.8) * 2.0;
+                double dt = full.getDt();
                 if (t == 0)
                 {
                     output = new List<string>();
+                    //firstAction(DA);
                     FriedChiken.clear();
                     lpS = new List<GH_particleSystem>();
                     if (!DA.GetDataList(0, lpS)) return;
@@ -310,9 +451,9 @@ namespace mikity.ghComponents
                             }
                         }
                     }
-                    __dist = dist;
-
                     FriedChiken.begin();
+                    refX = DoubleArray.From(FriedChiken.x.rawData);
+                    __dist = dist;
                     if (FriedChiken.numCond > 0)
                     {
                         lambda = new vector(FriedChiken.numCond).zeros();
@@ -348,80 +489,118 @@ namespace mikity.ghComponents
                     }
                 }
                 //Computation
-                stw.Start();
-                FriedChiken.Tick(t);//要素アップデート、勾配の計算
-                FriedChiken.Tack(t);//マスク等後処理
-                if (FriedChiken.numCond > 0)
-                {
-                    var jacob = ShoNS.Array.DoubleArray.From(FriedChiken.getJacobian().rawData);
-                    var omega = ShoNS.Array.DoubleArray.From(FriedChiken.omega.rawData);
-                    jacob = jacob.T;
-                    omega = omega.T;
-                    var solver = new ShoNS.Array.Solver(jacob);
-                    var _lambda=solver.Solve(omega);
-                    _lambda.CopyTo(lambda, 0);
-                    
-                    FriedChiken.omega.xminusyA(FriedChiken.omega, lambda, FriedChiken.getJacobian());
-                }
-                string tmp="\t"+t.ToString()+"\t";
-//                DA.SetData(1, FriedChiken.omega.norm);
-                tmp += FriedChiken.omega.norm.ToString()+"\t";
-                if (_normalize == true)
-                {
-                    FriedChiken.omega.dividedby(FriedChiken.omega.norm);//力を加速度に
 
-                }
-
-                FriedChiken.omega.MinusTo(FriedChiken.r);//力を加速度に
-                
-                FriedChiken.q.times(0.98).Add(dt/Mass, FriedChiken.r);
-                if (_geodesic == true)
+                while (stw.ElapsedMilliseconds< 25)
                 {
-                    if (FriedChiken.numCond > 0)
-                    {
-                        matrix.y_equals_Ax(FriedChiken.getJacobian(), FriedChiken.q, qr);
-                        var jacob = ShoNS.Array.DoubleArray.From(FriedChiken.getJacobian().rawData);
-                        var _qr = ShoNS.Array.DoubleArray.From(qr.rawData).T;
-                        var solve = new ShoNS.Array.Solver(jacob);
-                        var z=solve.Solve(_qr);
-                        double[] _qo = qo.rawData;
-                        z.CopyTo(_qo, 0);
-                        FriedChiken.q.Subtract(qo);
-                    }
-                }
-                FriedChiken.x.Add(dt, FriedChiken.q);
-                int __s = 0;
-                if (FriedChiken.numCond > 0)
-                {
+                    stw.Start();
                     FriedChiken.Tick(t);//要素アップデート、勾配の計算
                     FriedChiken.Tack(t);//マスク等後処理
-
-                    for (__s = 0; __s < 50; __s++)
+                    if (FriedChiken.numCond > 0)
                     {
-                        var f = ShoNS.Array.DoubleArray.From(FriedChiken.getJacobian().rawData);
-                        var g = ShoNS.Array.DoubleArray.From(FriedChiken.getResidual().rawData).T;
-                        var solver = new ShoNS.Array.Solver(f);
-                        var _dx=solver.Solve(g);
-                        _dx.CopyTo(dx.rawData, 0);
-                        FriedChiken.x.Subtract(1.0,dx);
+                        var jacob = ShoNS.Array.DoubleArray.From(FriedChiken.getJacobian().rawData);
+                        var omega = ShoNS.Array.DoubleArray.From(FriedChiken.omega.rawData);
+                        jacob = jacob.T;
+                        omega = omega.T;
+                        var solver = new ShoNS.Array.Solver(jacob);
+                        var _lambda = solver.Solve(omega);
+                        _lambda.CopyTo(lambda, 0);
+
+                        FriedChiken.omega.xminusyA(FriedChiken.omega, lambda, FriedChiken.getJacobian());
+                    }
+                    string tmp = "\t" + t.ToString() + "\t";
+                    var v = DoubleArray.From(FriedChiken.q.rawData);
+                    tmp += FriedChiken.omega.norm.ToString() + "\t";
+                    
+                    if (_geodesic == true)
+                    {
+                        if (FriedChiken.numCond > 0)
+                        {
+                            matrix.y_equals_Ax(FriedChiken.getJacobian(), FriedChiken.q, qr);
+                            var jacob = ShoNS.Array.DoubleArray.From(FriedChiken.getJacobian().rawData);
+                            var _qr = ShoNS.Array.DoubleArray.From(qr.rawData).T;
+                            var solve = new ShoNS.Array.Solver(jacob);
+                            var z = solve.Solve(_qr);
+                            double[] _qo = qo.rawData;
+                            z.CopyTo(_qo, 0);
+                            FriedChiken.q.Subtract(qo);
+                        }
+                    }
+                    var a = DoubleArray.From(FriedChiken.omega.rawData);
+                    double normW=FriedChiken.omega.norm;
+                    full.addNorm(normW);
+                    if (_normalize == true)
+                    {
+                        if (normW >= 1.0)
+                            FriedChiken.omega.dividedby(normW);//力を加速度に
+                    }
+
+                    FriedChiken.omega.MinusTo(FriedChiken.r);//力を加速度に
+                    double norm1 = (v * v.T)[0, 0];
+                    double norm2 = (v * a.T)[0, 0];
+                    double norm3 = (a * a.T)[0, 0];
+                    double f = 0;
+                    if (norm1 * norm3 != 0)
+                    {
+                        f = -norm2 / Math.Sqrt(norm1 * norm3);
+                    }
+                    else
+                    {
+                        f = 1;
+                    }
+
+                    double damping = 0;
+                    if (_drift1)
+                    {
+                        damping = Drift1(f);
+                    }
+                    else if (_drift2)
+                    {
+                        damping = Drift2(f);
+                    }
+                    else
+                    {
+                        damping = Drift0(f);
+                    }
+
+                    full.move(f);
+
+                    dbg = "damping:" + damping.ToString()+"\n"+"dt:"+dt.ToString();
+                    full.setDbgText(dbg);
+                    FriedChiken.q.times(damping).Add(dt, FriedChiken.r);
+                    FriedChiken.x.Add(dt, FriedChiken.q);
+                    int __s = 0;
+                    if (FriedChiken.numCond > 0)
+                    {
                         FriedChiken.Tick(t);//要素アップデート、勾配の計算
                         FriedChiken.Tack(t);//マスク等後処理
-                        if (FriedChiken.getResidual().norm < 0.001) break;
-                    }
-                }
-                if (FriedChiken.numCond > 0)
-                {
-                    tmp += FriedChiken.getResidual().norm.ToString() + "\t";
-                    tmp += (__s+1).ToString();
-                }
-                if (t <1000)
-                {
-                    output.Add(tmp);
-                }
 
-                //DA.SetDataList(1, output);
-                stw.Stop();
-                dbg = t.ToString()+"\n"+dbg + "\n" + stw.ElapsedMilliseconds.ToString();
+                        for (__s = 0; __s < 50; __s++)
+                        {
+                            var ff = ShoNS.Array.DoubleArray.From(FriedChiken.getJacobian().rawData);
+                            var g = ShoNS.Array.DoubleArray.From(FriedChiken.getResidual().rawData).T;
+                            var solver = new ShoNS.Array.Solver(ff);
+                            var _dx = solver.Solve(g);
+                            _dx.CopyTo(dx.rawData, 0);
+                            FriedChiken.x.Subtract(1.0, dx);
+                            FriedChiken.Tick(t);//要素アップデート、勾配の計算
+                            FriedChiken.Tack(t);//マスク等後処理
+                            if (FriedChiken.getResidual().norm < 0.001) break;
+                        }
+                    }
+                    if (FriedChiken.numCond > 0)
+                    {
+                        tmp += FriedChiken.getResidual().norm.ToString() + "\t";
+                        tmp += (__s + 1).ToString();
+                    }
+                    if (t < 1000)
+                    {
+                        output.Add(tmp);
+                    }
+
+                    //DA.SetDataList(1, output);
+                    stw.Stop();
+                    if (_RP == false) break;
+                }
                 stw.Reset();
                 
                 //////////////
@@ -485,7 +664,7 @@ namespace mikity.ghComponents
                 }
                 
                 
-                DA.SetData(1, dbg);
+                //DA.SetData(1, dbg);
                 stw.Start();
                 t++;
             }

@@ -252,8 +252,12 @@ namespace RamGecTools
         /// Function that will be called when defined events occur
         /// </summary>
         /// <param name="key">VKeys</param>
-        public delegate void KeyboardHookCallback(VKeys key);
+        public delegate bool KeyboardHookCallback(VKeys key);
+        public delegate void activate();
+        public delegate void deactivate();
 
+        public activate _activate;
+        public deactivate _deactivate;
         #region Events
         public event KeyboardHookCallback KeyDown;
         public event KeyboardHookCallback KeyUp;
@@ -295,6 +299,7 @@ namespace RamGecTools
         /// <summary>
         /// Default hook call, which analyses pressed keys
         /// </summary>
+        bool through = false;
         private IntPtr HookFunc(int nCode, IntPtr wParam, IntPtr lParam)
         {
             /*if (nCode < 0)
@@ -308,19 +313,30 @@ namespace RamGecTools
                 if ((iwParam == WM_KEYDOWN || iwParam == WM_SYSKEYDOWN))
                     if (KeyDown != null)
                     {
-                        KeyDown((VKeys)Marshal.ReadInt32(lParam));
-                        //return (IntPtr)1;
+                        if (through)
+                        {
+                            if(KeyDown((VKeys)Marshal.ReadInt32(lParam)))
+                            return (IntPtr)1;
+                        }
                     }
                 if ((iwParam == WM_KEYUP || iwParam == WM_SYSKEYUP))
                     if (KeyUp != null)
                     {
-                        KeyUp((VKeys)Marshal.ReadInt32(lParam));
-                        //return (IntPtr)1;
+                        if ((VKeys)Marshal.ReadInt32(lParam) == VKeys.LCONTROL)
+                        {
+                            through = through ? false : true;
+                            if (through) _activate();
+                            if (!through) _deactivate();
+                        }else{
+                            if (through)
+                            {
+                                if(KeyUp((VKeys)Marshal.ReadInt32(lParam)))
+                                return (IntPtr)1;
+                            }
+                        }
                     }
             }
-            
-            
-            return CallNextHookEx(hookID, nCode, wParam, lParam);
+           return CallNextHookEx(hookID, nCode, wParam, lParam);
         }
 
         /// <summary>
