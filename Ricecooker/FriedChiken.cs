@@ -16,7 +16,11 @@ namespace mikity.ghComponents
     {
         Func<double, double> Drift0 = (v) => { return 0.98; };
         Func<double, double> Drift1 = (v) => { /*if (v > 0)*/ return v / 20d + 0.95; /*else return 0.95;*/ };
+<<<<<<< HEAD
         Func<double, double> Drift2 = (v) => { if (v >=0)return 1.0; else return 0.0; };
+=======
+        Func<double, double> Drift2 = (v) => { if (v > -0.001)return 1.0; else return 0.0; };
+>>>>>>> 00d64915f858c629982b1e933f568d4538530db3
         mikity.visualize.fullScreen full;
         protected override System.Drawing.Bitmap Icon
         {
@@ -42,6 +46,7 @@ namespace mikity.ghComponents
         {
             keyboardHook.Uninstall();
         }
+<<<<<<< HEAD
         public override void AddedToDocument(Grasshopper.Kernel.GH_Document document)
         {
 
@@ -85,22 +90,36 @@ namespace mikity.ghComponents
                 timer = null;
             }
         }
+=======
+>>>>>>> 00d64915f858c629982b1e933f568d4538530db3
         public override void DocumentContextChanged(Grasshopper.Kernel.GH_Document document, Grasshopper.Kernel.GH_DocumentContext context)
         {
             base.DocumentContextChanged(document, context);
             if (context == Grasshopper.Kernel.GH_DocumentContext.Loaded)
             {
+<<<<<<< HEAD
+=======
+                //Rhino.RhinoDoc.ReplaceRhinoObject += RhinoDoc_ReplaceRhinoObject;
+>>>>>>> 00d64915f858c629982b1e933f568d4538530db3
                 timer = new System.Windows.Forms.Timer();
                 timer.Tick += timer_Tick;
                 timer.Enabled = false;
                 timer.Interval = 1;
 
                 // register evens
+<<<<<<< HEAD
                 keyboardHook.KeyDown = new RamGecTools.KeyboardHook.KeyboardHookCallback(keyboardHook_KeyDown);
                 keyboardHook.KeyUp = new RamGecTools.KeyboardHook.KeyboardHookCallback(keyboardHook_KeyUp);
                 keyboardHook._activate = new RamGecTools.KeyboardHook.activate(activate);
                 keyboardHook._deactivate = new RamGecTools.KeyboardHook.deactivate(deactivate);
                 keyboardHook.Uninstall();
+=======
+                keyboardHook.KeyDown += new RamGecTools.KeyboardHook.KeyboardHookCallback(keyboardHook_KeyDown);
+                keyboardHook.KeyUp += new RamGecTools.KeyboardHook.KeyboardHookCallback(keyboardHook_KeyUp);
+                keyboardHook._activate = new RamGecTools.KeyboardHook.activate(activate);
+                keyboardHook._deactivate = new RamGecTools.KeyboardHook.deactivate(deactivate);
+            
+>>>>>>> 00d64915f858c629982b1e933f568d4538530db3
                 keyboardHook.Install();
                 full = new mikity.visualize.fullScreen();
                 full.deactivate();
@@ -109,6 +128,10 @@ namespace mikity.ghComponents
                 full.drift1();
                 full.renewPlot(Drift1);
                 full.onRF();
+<<<<<<< HEAD
+=======
+                
+>>>>>>> 00d64915f858c629982b1e933f568d4538530db3
             }
             if (context == Grasshopper.Kernel.GH_DocumentContext.Unloaded)
             {
@@ -246,6 +269,16 @@ namespace mikity.ghComponents
         
         System.Windows.Forms.Timer timer;
         
+<<<<<<< HEAD
+=======
+        public override void AddedToDocument(Grasshopper.Kernel.GH_Document document)
+        {
+            
+            base.AddedToDocument(document);
+
+
+        }
+>>>>>>> 00d64915f858c629982b1e933f568d4538530db3
 
         protected override void RegisterInputParams(Grasshopper.Kernel.GH_Component.GH_InputParamManager pManager)
         {
@@ -566,6 +599,7 @@ namespace mikity.ghComponents
                     {
                         if (normW >= 1.0)
                             FriedChiken.omega.dividedby(normW);//力を加速度に
+<<<<<<< HEAD
                     }
 
                     FriedChiken.omega.MinusTo(FriedChiken.r);//力を加速度に
@@ -582,6 +616,24 @@ namespace mikity.ghComponents
                         f = 1;
                     }
 
+=======
+                    }
+
+                    FriedChiken.omega.MinusTo(FriedChiken.r);//力を加速度に
+                    double norm1 = (v * v.T)[0, 0];
+                    double norm2 = (v * a.T)[0, 0];
+                    double norm3 = (a * a.T)[0, 0];
+                    double f = 0;
+                    if (norm1 * norm3 != 0)
+                    {
+                        f = -norm2 / Math.Sqrt(norm1 * norm3);
+                    }
+                    else
+                    {
+                        f = 1;
+                    }
+
+>>>>>>> 00d64915f858c629982b1e933f568d4538530db3
                     double damping = 0;
                     if (_drift1)
                     {
