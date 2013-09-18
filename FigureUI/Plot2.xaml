@@ -6,6 +6,12 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Canvas Width="200" Height="100" x:Name="canvas" Background="#FFFFFFFF" >
+        <Canvas.ContextMenu>
+            <ContextMenu>
+                <MenuItem Name="MenuItem2" Header="Export last plot to a .csv" Click="MenuItem_Click2" />
+                <MenuItem Name="MenuItem" Header="Export to a .csv" Click="MenuItem_Click" />
+            </ContextMenu>
+        </Canvas.ContextMenu>
         <Canvas.Effect>
             <DropShadowEffect ShadowDepth="10" BlurRadius="20" Opacity="0.5" Color="Blue"></DropShadowEffect>
         </Canvas.Effect>

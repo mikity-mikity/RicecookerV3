@@ -54,10 +54,19 @@
                     <StackPanel Orientation="Vertical" Margin="5,0,0,0"  VerticalAlignment="Top">
                         <Label Name="_rf1" Style="{StaticResource T1}" Effect="{StaticResource E1}">Repeat Cycle (R key)</Label>
                         <Label Name="_rf2" Style="{StaticResource T1}" Effect="{StaticResource E2}">Off</Label>
-                        
+
+                        <Label Name="_norm1" Style="{StaticResource T1}" Effect="{StaticResource E1}">Normalize (N key)</Label>
+                        <Label Name="_norm2" Style="{StaticResource T1}" Effect="{StaticResource E2}">On</Label>
+                    
+                        <Label Name="_geo1" Style="{StaticResource T1}" Effect="{StaticResource E1}">Geodesic (H key)</Label>
+                        <Label Name="_geo2" Style="{StaticResource T1}" Effect="{StaticResource E2}">On</Label>
                     </StackPanel>
+                    <StackPanel>
                     <visualize:Plot2 x:Name="graph2" Margin="20,20,20,20">
                     </visualize:Plot2>
+                    <visualize:Plot2 x:Name="graph3" Margin="20,20,20,20">
+                    </visualize:Plot2>
+                    </StackPanel>
                     <DockPanel DockPanel.Dock="Right" Margin="0,5,5,0">
                         <TextBlock DockPanel.Dock="Top"  x:Name="dbg" Height="120" Margin="0,0,0,0" Style="{StaticResource T2}" Effect="{StaticResource E4}" Background="#DDFFFFFF">aaa</TextBlock>
                         <visualize:DT x:Name="dt" DockPanel.Dock="Bottom" ></visualize:DT>

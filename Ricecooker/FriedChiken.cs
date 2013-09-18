@@ -70,6 +70,8 @@ namespace mikity.ghComponents
             full.drift1();
             full.renewPlot(Drift1);
             full.onRF();
+            full.onNorm();
+            full.onGeo();
         }
         
         public override void RemovedFromDocument(Grasshopper.Kernel.GH_Document document)
@@ -118,6 +120,8 @@ namespace mikity.ghComponents
                 full.drift1();
                 full.renewPlot(Drift1);
                 full.onRF();
+                full.onNorm();
+                full.onGeo();
             }
             if (context == Grasshopper.Kernel.GH_DocumentContext.Unloaded)
             {
@@ -143,8 +147,21 @@ namespace mikity.ghComponents
        
         RamGecTools.MouseHook mouseHook = new RamGecTools.MouseHook();
         RamGecTools.KeyboardHook keyboardHook = new RamGecTools.KeyboardHook();
+        System.Random rand = new Random();
         bool keyboardHook_KeyUp(RamGecTools.KeyboardHook.VKeys key)
-        {            
+        {
+            if (key == RamGecTools.KeyboardHook.VKeys.KEY_F)
+            {
+                
+                for(int i=0;i<FriedChiken.nParticles;i++)
+                {
+                    FriedChiken.x[i * 3 + 0] += (rand.NextDouble() - 0.5) * 50d;
+                    FriedChiken.x[i * 3 + 1] += (rand.NextDouble() - 0.5) * 50d;
+                    FriedChiken.x[i * 3 + 2] += (rand.NextDouble() - 0.5) * 50d;
+                }
+                return true;
+            }
+
             if (key == RamGecTools.KeyboardHook.VKeys.KEY_R)
             {
                 if (_RP)
@@ -159,7 +176,37 @@ namespace mikity.ghComponents
                 }
                 return true;
             }
-            
+
+            if (key == RamGecTools.KeyboardHook.VKeys.KEY_N)
+            {
+                if (_normalize)
+                {
+                    _normalize = false;
+                    full.offNorm();
+                }
+                else
+                {
+                    _normalize = true;
+                    full.onNorm();
+                }
+                return true;
+            }
+
+            if (key == RamGecTools.KeyboardHook.VKeys.KEY_H)
+            {
+                if (_geodesic)
+                {
+                    _geodesic = false;
+                    full.offGeo();
+                }
+                else
+                {
+                    _geodesic = true;
+                    full.onGeo();
+                }
+                return true;
+            }
+
             if (key == RamGecTools.KeyboardHook.VKeys.KEY_A)
             {
                 if (_drift1)
@@ -190,6 +237,7 @@ namespace mikity.ghComponents
             if (key == RamGecTools.KeyboardHook.VKeys.ESCAPE)
             {
                 full.resetGo();
+                full.clearNorm();
                 _go = false;
                 timer.Enabled = false;
                 if (t!=0&&refX != null)
@@ -229,7 +277,19 @@ namespace mikity.ghComponents
 
         bool keyboardHook_KeyDown(RamGecTools.KeyboardHook.VKeys key)
         {
+            if (key == RamGecTools.KeyboardHook.VKeys.KEY_F)
+            {
+                return true;
+            }
             if (key == RamGecTools.KeyboardHook.VKeys.KEY_R)
+            {
+                return true;
+            }
+            if (key == RamGecTools.KeyboardHook.VKeys.KEY_N)
+            {
+                return true;
+            }
+            if (key == RamGecTools.KeyboardHook.VKeys.KEY_H)
             {
                 return true;
             }
@@ -388,19 +448,10 @@ namespace mikity.ghComponents
         }
         public override bool Read(GH_IO.Serialization.GH_IReader reader)
         {
-            _normalize = false;//default value;
-            reader.TryGetBoolean("Normalize?", ref _normalize);
-            _geodesic = false;//default value;
-            reader.TryGetBoolean("Geodesic?", ref _geodesic);
-            _go = false;//default value;
-            reader.TryGetBoolean("Go?", ref _go);
             return base.Read(reader);
         }
         public override bool Write(GH_IO.Serialization.GH_IWriter writer)
         {
-            writer.SetBoolean("Normalize?",_normalize);
-            writer.SetBoolean("Geodesic?", _geodesic);
-            writer.SetBoolean("Go?", false);
             return base.Write(writer);
         }
 
@@ -569,7 +620,6 @@ namespace mikity.ghComponents
                     }
                     var a = DoubleArray.From(FriedChiken.omega.rawData);
                     double normW=FriedChiken.omega.norm;
-                    full.addNorm(normW);
                     if (_normalize == true)
                     {
                             FriedChiken.omega.dividedby(normW);//力を加速度に
@@ -605,9 +655,12 @@ namespace mikity.ghComponents
 
                     full.move(f);
 
-                    dbg = "damping:" + damping.ToString()+"\n"+"dt:"+dt.ToString();
+                    dbg = "damping:" + damping.ToString() + "\n" + "dt:" + dt.ToString() + "\n" + "Step#:"+t.ToString();
                     full.setDbgText(dbg);
                     FriedChiken.q.times(damping).Add(dt, FriedChiken.r);
+                    double normQ = FriedChiken.q.norm;
+                    full.addNorm(normW, normQ);
+
                     FriedChiken.x.Add(dt, FriedChiken.q);
                     int __s = 0;
                     if (FriedChiken.numCond > 0)
@@ -628,18 +681,9 @@ namespace mikity.ghComponents
                             if (FriedChiken.getResidual().norm < 0.001) break;
                         }
                     }
-                    if (FriedChiken.numCond > 0)
-                    {
-                        tmp += FriedChiken.getResidual().norm.ToString() + "\t";
-                        tmp += (__s + 1).ToString();
-                    }
-                    if (t < 1000)
-                    {
-                        output.Add(tmp);
-                    }
 
-                    //DA.SetDataList(1, output);
                     stw.Stop();
+                    t++;
                     if (_RP == false) break;
                 }
                 stw.Reset();
@@ -703,11 +747,6 @@ namespace mikity.ghComponents
                         }
                     }
                 }
-                
-                
-                //DA.SetData(1, dbg);
-                stw.Start();
-                t++;
             }
 
             return;

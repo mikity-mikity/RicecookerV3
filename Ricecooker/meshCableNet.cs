@@ -143,7 +143,7 @@ namespace mikity.ghComponents
                 m.Clear();
                 foreach (var e in el)
                 {
-                    m.Add(new Rhino.Geometry.Line(pS.Value.particles[e[0], 0], pS.Value.particles[e[0], 1], pS.Value.particles[e[0], 2], pS.Value.particles[e[1], 0], pS.Value.particles[e[1], 1], pS.Value.particles[e[1], 2]));
+                    m.Add(new Rhino.Geometry.Line(pS.Value.particles[e[0], 0] + x, pS.Value.particles[e[0], 1] + y, pS.Value.particles[e[0], 2] + z, pS.Value.particles[e[1], 0] + x, pS.Value.particles[e[1], 1] + y, pS.Value.particles[e[1], 2] + z));
                 }
             });
         }

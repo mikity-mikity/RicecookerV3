@@ -21,6 +21,7 @@ namespace mikity.visualize
     public partial class Plot2 : UserControl
     {
         List<double> vals = new List<double>();
+        List<double> lastVals;
         Func<double, double> converterX;
         Func<double, double> converterY;
         public void add(double val)
@@ -30,17 +31,23 @@ namespace mikity.visualize
         }
         public void Clear()
         {
-            vals.Clear();
+            lastVals = vals;
+            vals=new List<double>();
+            minX = 0;
+            maxX = 0;
+            minY = 0;
+            maxY = 100;
+
         }
         int minX=0, maxX=0;
         double minY=0, maxY=100;
         public void update()
         {
             double aMinY = 0;
-            if (vals.Count > 1000)
+            /*if (vals.Count > 1000)
             {
                 vals=vals.Skip(vals.Count-81).Take(81).ToList();
-            }
+            }*/
             if (vals.Count < 1) return;
             if (vals.Count < 81)
             {
@@ -101,6 +108,62 @@ namespace mikity.visualize
                 canvas.Children.Add(lines[i]);
             }
             this.update();
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (vals != null&&vals.Count>0)
+            {
+                var dlg = new Microsoft.Win32.SaveFileDialog();
+                dlg.FileName = "result"; // Default file name
+                dlg.DefaultExt = ".csv"; // Default file extension
+                dlg.Filter = "csv document|*.csv"; // Filter files by extension 
+
+                // Show save file dialog box
+                Nullable<bool> result = dlg.ShowDialog();
+                if (result == true)
+                {
+                    // Save document 
+                    string filename = dlg.FileName;
+                    var sw = new System.IO.StreamWriter(filename, false);
+                    for (int i = 0; i < vals.Count; i++)
+                    {
+                        sw.WriteLine((i + 1).ToString() + "," + vals[i].ToString());
+                    }
+                    sw.Close();
+                }
+            }
+            else
+            {
+                MessageBox.Show("You don't have a valid data to export");
+            }
+        }
+        private void MenuItem_Click2(object sender, RoutedEventArgs e)
+        {
+            if (lastVals != null&&lastVals.Count>0)
+            {
+                var dlg = new Microsoft.Win32.SaveFileDialog();
+                dlg.FileName = "result"; // Default file name
+                dlg.DefaultExt = ".csv"; // Default file extension
+                dlg.Filter = "csv document|*.csv"; // Filter files by extension 
+
+                // Show save file dialog box
+                Nullable<bool> result = dlg.ShowDialog();
+                if (result == true)
+                {
+                    // Save document 
+                    string filename = dlg.FileName;
+                    var sw = new System.IO.StreamWriter(filename, false);
+                    for (int i = 0; i < vals.Count; i++)
+                    {
+                        sw.WriteLine((i + 1).ToString() + "," + lastVals[i].ToString());
+                    } sw.Close();
+                }
+            }
+            else
+            {
+                MessageBox.Show("You don't have a valid data to export");
+            }
         }
     }
 }

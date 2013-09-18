@@ -37,11 +37,17 @@ namespace mikity.visualize
             drift0();
             setDbgText("Test");
         }
-        public void addNorm(double v)
+        public void addNorm(double v,double v2)
         {
             this.graph2.add(v);
+            this.graph3.add(v2);
         }
-        public void renewPlot(Func<double,double> d)
+        public void clearNorm()
+        {
+            this.graph2.Clear();
+            this.graph3.Clear();
+        }
+        public void renewPlot(Func<double, double> d)
         {
             graph.renew(d);
         }
@@ -58,6 +64,26 @@ namespace mikity.visualize
         {
             _rf2.Content = "OFF";
             _rf2.Effect = (System.Windows.Media.Effects.Effect)this.FindResource("E2");
+        }
+        public void onNorm()
+        {
+            _norm2.Content = "ON";
+            _norm2.Effect = (System.Windows.Media.Effects.Effect)this.FindResource("E3");
+        }
+        public void offNorm()
+        {
+            _norm2.Content = "OFF";
+            _norm2.Effect = (System.Windows.Media.Effects.Effect)this.FindResource("E2");
+        }
+        public void onGeo()
+        {
+            _geo2.Content = "ON";
+            _geo2.Effect = (System.Windows.Media.Effects.Effect)this.FindResource("E3");
+        }
+        public void offGeo()
+        {
+            _geo2.Content = "OFF";
+            _geo2.Effect = (System.Windows.Media.Effects.Effect)this.FindResource("E2");
         }
         public void onGo()
         {
