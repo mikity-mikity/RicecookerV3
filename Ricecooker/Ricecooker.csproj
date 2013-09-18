@@ -47,7 +47,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="MatrixInterf, Version=2.0.5.0, Culture=neutral, PublicKeyToken=1fa71b5ffec10e32, processorArchitecture=MSIL">
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.VisualC.STLCLR" />
     <Reference Include="PresentationCore" />
@@ -62,12 +62,13 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="ShoArray, Version=2.0.5.0, Culture=neutral, PublicKeyToken=1635376d5e62ab5f, processorArchitecture=MSIL">
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
@@ -115,6 +116,10 @@
     <Compile Include="4nodesNetwork.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FigureUI\FigureUI.csproj">
+      <Project>{22d8c56b-1e72-4413-ac41-c131d40f4fad}</Project>
+      <Name>FigureUI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FriedChikenLinAlg\mikityLinearAlgebra.csproj">
       <Project>{35A8E238-9BB3-4EEF-A1F3-0E4C38C4C6C3}</Project>
       <Name>mikityLinearAlgebra</Name>
@@ -224,25 +229,12 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="bin32\libiomp5md.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="bin32\mkl_custom.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="bin64\libiomp5md.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="bin64\mkl_custom.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>ILMerge /out:$(ProjectName)Support.dll /lib:C:\Windows\Microsoft.NET\Framework\v4.0.30319 /wildcards $(ProjectName).dll mikity*.dll
+    <PostBuildEvent>$(ProjectDir)\..\packages\ilmerge.2.13.0307\ILMerge /out:$(ProjectName)Support.dll /lib:C:\Windows\Microsoft.NET\Framework\v4.0.30319 /wildcards $(ProjectName).dll mikity*.dll
 Erase "$(TargetDir)\mikity*.dll"
 Copy "$(TargetDir)\$(ProjectName)Support.dll" "$(TargetDir)\merge\$(ProjectName).gha"
+Copy "$(TargetDir)\figureUI2.dll" "$(TargetDir)\merge\"
 
 Copy "$(TargetDir)\Presentation*.dll" "$(TargetDir)\merge\Presentation*.dll"
 Copy  "$(TargetDir)\merge\$(ProjectName).gha" "C:\Users\$(Username)\AppData\Roaming\Grasshopper\Libraries\
