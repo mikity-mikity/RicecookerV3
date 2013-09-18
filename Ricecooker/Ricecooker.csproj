@@ -76,6 +76,7 @@
     <Compile Include="3nodesNetwork.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="GeometryProcessing.cs" />
     <Compile Include="KeyboardHook.cs" />
     <Compile Include="materials.cs" />
     <Compile Include="isoparametricArray.cs" />
@@ -114,6 +115,7 @@
     <Compile Include="gravity.cs" />
     <Compile Include="nodePairsFixedNodes.cs" />
     <Compile Include="4nodesNetwork.cs" />
+    <Compile Include="meshCableNet.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FigureUI\FigureUI.csproj">
