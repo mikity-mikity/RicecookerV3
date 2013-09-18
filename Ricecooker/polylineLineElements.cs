@@ -54,6 +54,13 @@ namespace mikity.ghComponents
             }
             base.DrawViewportWires(args); 
         }
+        public override void BakeGeometry(Rhino.RhinoDoc doc, Rhino.DocObjects.ObjectAttributes att, List<Guid> obj_ids)
+        {
+            if (this.BKGT != null)
+            {
+                this.BKGT(doc, att, obj_ids);
+            }
+        }
         private const int _nNodes = 2;
         private const int _dim = 1;
 
@@ -62,6 +69,7 @@ namespace mikity.ghComponents
         mikity.NumericalMethodHelper.objects.generalSpring eM = null;
         Rhino.Geometry.Polyline lGeometry;
         Rhino.Geometry.Polyline lGeometry2;
+        BakeGeometry BKGT = null;
         List<Rhino.Geometry.Point3d> newNodes = new List<Rhino.Geometry.Point3d>();
         protected override void SolveInstance(Grasshopper.Kernel.IGH_DataAccess DA)
         {
@@ -110,6 +118,8 @@ namespace mikity.ghComponents
                         this.DVPW = GetDVPW(lGeometry);
                         pS.DVPW = GetDVPW(lGeometry2);
                         pS.UPGR = GetUPGR(lGeometry2);
+                        pS.BKGT = GetBKGT(lGeometry2);
+                        this.BKGT = GetBKGT(lGeometry);
 
                         DA.SetData(0, pS);
                         DA.SetDataList(1, newNodes);
@@ -122,6 +132,16 @@ namespace mikity.ghComponents
                 }
 
             }
+        }
+        public BakeGeometry GetBKGT(Rhino.Geometry.Polyline m)
+        {
+            return new BakeGeometry((d, a, o) =>
+            {
+                Rhino.DocObjects.ObjectAttributes a2 = a.Duplicate();
+                a2.LayerIndex = 2;
+                Guid id = d.Objects.AddPolyline(m, a2);
+                o.Add(id);
+            });
         }
         public UpdateGeometry GetUPGR(Rhino.Geometry.Polyline m)
         {

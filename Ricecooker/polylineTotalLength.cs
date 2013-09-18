@@ -47,28 +47,29 @@ namespace mikity.ghComponents
         }
         public override void DrawViewportWires(Grasshopper.Kernel.IGH_PreviewArgs args)
         {
-            if (Hidden)
+            if (this.DVPW != null)
             {
-                return;
-            }
-            if (this.Attributes.Selected)
-            {
-                args.Display.DrawLines(lGeometry, System.Drawing.Color.Magenta, 3);
-            }
-            else
-            {
-                args.Display.DrawLines(lGeometry, System.Drawing.Color.DarkMagenta, 3);
+                this.DVPW(args);
             }
             base.DrawViewportWires(args);
         }
+        public override void BakeGeometry(Rhino.RhinoDoc doc, Rhino.DocObjects.ObjectAttributes att, List<Guid> obj_ids)
+        {
+            if (this.BKGT != null)
+            {
+                this.BKGT(doc, att, obj_ids);
+            }
+        }
         private const int _nNodes = 2;
         private const int _dim = 1;
-
+        DrawViewPortWire DVPW = null;
+        Rhino.Geometry.Polyline lGeometry = new Rhino.Geometry.Polyline();
+        Rhino.Geometry.Polyline lGeometry2 = new Rhino.Geometry.Polyline();
+        BakeGeometry BKGT = null;
         GH_particleSystem pS;
         int nNewNodes = 0;
         int nElements = 0;
         mikity.NumericalMethodHelper.objects.constrainVolumeObject cV = null;
-        List<Rhino.Geometry.Line> lGeometry = new List<Rhino.Geometry.Line>();
         List<Rhino.Geometry.Point3d> newNodes = new List<Rhino.Geometry.Point3d>();
         protected override void SolveInstance(Grasshopper.Kernel.IGH_DataAccess DA)
         {
@@ -88,10 +89,6 @@ namespace mikity.ghComponents
                         newNodes.Clear();
                         newNodes.AddRange(pl);
                         lGeometry.Clear();
-                        for (int i = 0; i < nElements; i++)
-                        {
-                            lGeometry.Add(new Rhino.Geometry.Line(newNodes[i], newNodes[i + 1]));
-                        }
 
                         cV = new constrainVolumeObject(v);
                         mikity.NumericalMethodHelper.particle[] particles = new mikity.NumericalMethodHelper.particle[nNewNodes];
@@ -110,11 +107,10 @@ namespace mikity.ghComponents
                             cV.addElement(e[i]);
                         }
                         pS.Value.addObject(cV);
-                        
                         lGeometry.Clear();
-                        for (int i = 0; i < nElements; i++)
+                        for (int i = 0; i < pS.Value.__N; i++)
                         {
-                            lGeometry.Add(new Rhino.Geometry.Line(pS.Value.particles[i, 0], pS.Value.particles[i, 1], pS.Value.particles[i, 2], pS.Value.particles[i + 1, 0], pS.Value.particles[i + 1, 1], pS.Value.particles[i + 1, 2]));
+                            lGeometry.Add(particles[i][0], particles[i][1], particles[i][2]);
                         }
                     }
                 }
@@ -132,10 +128,57 @@ namespace mikity.ghComponents
                     cV.refVolume = v / nElements;
                 }
             }
+            this.DVPW = GetDVPW(lGeometry);
+            pS.DVPW = GetDVPW(lGeometry2);
+            pS.UPGR = GetUPGR(lGeometry2);
+            pS.BKGT = GetBKGT(lGeometry2);
+            this.BKGT = GetBKGT(lGeometry);
+
             DA.SetData(0, pS);
             DA.SetDataList(1, newNodes);
         }
+        public BakeGeometry GetBKGT(Rhino.Geometry.Polyline m)
+        {
+            return new BakeGeometry((d, a, o) =>
+            {
+                Rhino.DocObjects.ObjectAttributes a2 = a.Duplicate();
+                a2.LayerIndex = 2;
+                Guid id = d.Objects.AddPolyline(m, a2);
+                o.Add(id);
+            });
+        }
+        public UpdateGeometry GetUPGR(Rhino.Geometry.Polyline m)
+        {
+            return new UpdateGeometry((x, y, z) =>
+            {
+                m.Clear();
+                for (int i = 0; i < pS.Value.__N; i++)
+                {
+                    m.Add(pS.Value.particles[i, 0] + x, pS.Value.particles[i, 1] + y, pS.Value.particles[i, 2] + z);
+                }
+            });
+        }
+        public DrawViewPortWire GetDVPW(Rhino.Geometry.Polyline m)
+        {
+            return new DrawViewPortWire((args) =>
+            {
+                if (Hidden)
+                {
+                    return;
+                }
+                if (this.Attributes.Selected)
+                {
+                    args.Display.DrawPolyline(m, System.Drawing.Color.Red, 3);
+                    args.Display.DrawPoints(m, Rhino.Display.PointStyle.Simple, 2, System.Drawing.Color.Yellow);
+                }
+                else
+                {
+                    args.Display.DrawPolyline(m, System.Drawing.Color.Cyan, 3);
+                    args.Display.DrawPoints(m, Rhino.Display.PointStyle.Simple, 2, System.Drawing.Color.Yellow);
+                }
 
+            });
+        }
         public override Guid ComponentGuid
         {
             get { return new Guid("bef9b72c-a4a0-4edf-82fa-34e4452bdfc7"); }

@@ -120,6 +120,7 @@ namespace mikity.ghComponents
                         pS.DVPW = GetDVPW(lGeometry2);
                         pS.UPGR = GetUPGR(lGeometry2);
                         pS.BKGT = GetBKGT(lGeometry2);
+                        this.BKGT = GetBKGT(lGeometry);
                     }
                 }
                 else

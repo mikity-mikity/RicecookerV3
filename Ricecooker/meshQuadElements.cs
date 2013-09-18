@@ -106,17 +106,23 @@ namespace mikity.ghComponents
                 if(isJoin){
                     pS.simplify(el);
                 }
+                lGeometry.Faces.Clear();
+                lGeometry2.Faces.Clear();
                 for (int i = 0; i < el.Count; i++)
                 {
                     if (el[i].Length == 4)
                     {
                         mikity.NumericalMethodHelper.elements.isoparametricElement e = new NumericalMethodHelper.elements.isoparametricElement(el[i]);
                         eM.addElement(e);
+                        lGeometry.Faces.AddFace(e.el[0], e.el[1], e.el[3], e.el[2]);
+                        lGeometry2.Faces.AddFace(e.el[0], e.el[1], e.el[3], e.el[2]);
                     }
                     else if (el[i].Length == 3)
                     {
                         mikity.NumericalMethodHelper.elements.simplexElement e = new NumericalMethodHelper.elements.simplexElement(el[i]);
                         eM.addElement(e);
+                        lGeometry.Faces.AddFace(e.el[0], e.el[1], e.el[2]);
+                        lGeometry2.Faces.AddFace(e.el[0], e.el[1], e.el[2]);
                     }
                 }
                 pS.Value.addObject(eM);
