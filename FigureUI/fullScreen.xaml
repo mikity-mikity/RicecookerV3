@@ -45,8 +45,8 @@
                 <DockPanel DockPanel.Dock="Top">
                     <Border x:Name="TT" Child="{StaticResource D1}" Width="240"></Border>
                     <StackPanel Orientation="Vertical" VerticalAlignment="Top">
-                        <Label Name="_drift1" Style="{StaticResource T1}" Effect="{StaticResource E1}">Drift! (A key)</Label>
-                        <Label Name="_drift2" Style="{StaticResource T1}" Effect="{StaticResource E2}">Off</Label>
+                        <Label Name="_drift1" Style="{StaticResource T1}" Effect="{StaticResource E1}">Damping (A key)</Label>
+                        <Label Name="_drift2" Style="{StaticResource T1}" Effect="{StaticResource E2}">Viscous</Label>
                         <visualize:Plot x:Name="graph" Margin="20,20,20,20">
                         </visualize:Plot>
                     </StackPanel>

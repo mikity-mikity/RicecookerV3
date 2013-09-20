@@ -101,17 +101,17 @@ namespace mikity.visualize
         }
         public void drift0()
         {
-            _drift2.Content = "Off";
+            _drift2.Content = "Viscous";
             _drift2.Effect = (System.Windows.Media.Effects.Effect)this.FindResource("E2");
         }
         public void drift1()
         {
-            _drift2.Content = "Proposed";
+            _drift2.Content = "Drift!";
             _drift2.Effect = (System.Windows.Media.Effects.Effect)this.FindResource("E3");
         }
         public void drift2()
         {
-            _drift2.Content = "Kinetic damping";
+            _drift2.Content = "Kinetic";
             _drift2.Effect = (System.Windows.Media.Effects.Effect)this.FindResource("E3");
         }
         public void move(double val)
