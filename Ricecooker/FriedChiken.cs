@@ -659,7 +659,6 @@ namespace mikity.ghComponents
                     full.setDbgText(dbg);
                     FriedChiken.q.times(damping).Add(dt, FriedChiken.r);
                     double normQ = FriedChiken.q.norm;
-                    full.addNorm(normW, normQ);
 
                     FriedChiken.x.Add(dt, FriedChiken.q);
                     int __s = 0;
@@ -678,9 +677,10 @@ namespace mikity.ghComponents
                             FriedChiken.x.Subtract(1.0, dx);
                             FriedChiken.Tick(t);//要素アップデート、勾配の計算
                             FriedChiken.Tack(t);//マスク等後処理
-                            if (FriedChiken.getResidual().norm < 0.001) break;
+                            if (FriedChiken.getResidual().norm < 0.0001) break;
                         }
                     }
+                    full.addNorm(normW, __s);
 
                     stw.Stop();
                     t++;

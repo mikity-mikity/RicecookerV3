@@ -72,7 +72,7 @@ namespace mikity.visualize
             Canvas.SetLeft(min, converterX(minX));
             minLine.Y1 = converterY(aMinY);
             minLine.Y2 = converterY(aMinY);
-            min.Content = minY.ToString("G3");
+            min.Content = aMinY.ToString("G3");
             for (int i = 0; i < 80; i++)
             {
                 lines[i].X1=converterX(i+minX);
