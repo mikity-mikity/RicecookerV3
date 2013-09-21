@@ -608,6 +608,7 @@ namespace mikity.ghComponents
                     {
                         if (FriedChiken.numCond > 0)
                         {
+                            //double norm = FriedChiken.q.norm;                            
                             matrix.y_equals_Ax(FriedChiken.getJacobian(), FriedChiken.q, qr);
                             var jacob = ShoNS.Array.DoubleArray.From(FriedChiken.getJacobian().rawData);
                             var _qr = ShoNS.Array.DoubleArray.From(qr.rawData).T;
@@ -616,6 +617,12 @@ namespace mikity.ghComponents
                             double[] _qo = qo.rawData;
                             z.CopyTo(_qo, 0);
                             FriedChiken.q.Subtract(qo);
+                            /*if (FriedChiken.q.norm != 0)
+                            {
+                                FriedChiken.q.dividedby(FriedChiken.q.norm);
+                                FriedChiken.q.times(norm);
+                            }*/
+
                         }
                     }
                     var a = DoubleArray.From(FriedChiken.omega.rawData);
