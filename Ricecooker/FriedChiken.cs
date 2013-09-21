@@ -680,7 +680,7 @@ namespace mikity.ghComponents
                             if (FriedChiken.getResidual().norm < 0.0001) break;
                         }
                     }
-                    full.addNorm(normW, __s);
+                    full.addNorm(normW, normQ);
 
                     stw.Stop();
                     t++;
