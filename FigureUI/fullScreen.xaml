@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         mc:Ignorable="d" 
-        Title="fullScreen"  Topmost="True" WindowState="Maximized" AllowsTransparency="True" WindowStyle="None" d:DesignHeight="1000" d:DesignWidth="1600" Background="Transparent">
+        Title="fullScreen" x:Name="window"  Topmost="True" WindowState="Maximized" AllowsTransparency="True" WindowStyle="None" d:DesignHeight="1000" d:DesignWidth="1600" Background="Transparent">
     <Window.Resources>
         <ResourceDictionary>
             <DropShadowEffect x:Key="E1" ShadowDepth="5" Direction="330" Color="Black" Opacity="1" BlurRadius="10"/>
@@ -27,7 +27,7 @@
                 <Setter Property="Foreground" Value="Black"/>
             </Style>
             <StackPanel x:Key="D1" VerticalAlignment="Top">
-                <Label Name="go" Style="{StaticResource T1}" Effect="{StaticResource E1}">Go! (G key)</Label>
+                <Label Name="go" Style="{StaticResource T1}" Effect="{StaticResource E1}" >Go! (G key)</Label>
             </StackPanel>
             <StackPanel x:Key="D2" VerticalAlignment="Top">
                 <Label Name="pause" Style="{StaticResource T1}" Effect="{StaticResource E1}">Pause (G key)</Label>
@@ -42,16 +42,16 @@
     <DockPanel>
         <Viewbox x:Name="view" Width="auto" Height="auto" DockPanel.Dock="Top" >
             <DockPanel Height="Auto" HorizontalAlignment="Stretch" Margin="12" Name="dockPanel1" VerticalAlignment="Top" Width="1600" Background="#33FFAA55">
-                <DockPanel DockPanel.Dock="Top">
-                    <Border x:Name="TT" Child="{StaticResource D1}" Width="240"></Border>
-                    <StackPanel Orientation="Vertical" VerticalAlignment="Top">
+                <DockPanel DockPanel.Dock="Top" x:Name="Dock0">
+                    <Border x:Name="TT" Child="{StaticResource D1}" Width="240" Background="Bisque"></Border>
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Top" x:Name="stack1">
                         <Label Name="_drift1" Style="{StaticResource T1}" Effect="{StaticResource E1}">Damping (A key)</Label>
                         <Label Name="_drift2" Style="{StaticResource T1}" Effect="{StaticResource E2}">Viscous</Label>
                         <visualize:Plot x:Name="graph" Margin="20,20,20,20">
                         </visualize:Plot>
                     </StackPanel>
-                    
-                    <StackPanel Orientation="Vertical" Margin="5,0,0,0"  VerticalAlignment="Top">
+
+                    <StackPanel Orientation="Vertical" Margin="5,0,0,0"  VerticalAlignment="Top" x:Name="stack2">
                         <Label Name="_rf1" Style="{StaticResource T1}" Effect="{StaticResource E1}">Repeat Cycle (R key)</Label>
                         <Label Name="_rf2" Style="{StaticResource T1}" Effect="{StaticResource E2}">Off</Label>
 
@@ -61,13 +61,13 @@
                         <Label Name="_geo1" Style="{StaticResource T1}" Effect="{StaticResource E1}">Geodesic (H key)</Label>
                         <Label Name="_geo2" Style="{StaticResource T1}" Effect="{StaticResource E2}">On</Label>
                     </StackPanel>
-                    <StackPanel>
+                    <StackPanel x:Name="stack3">
                     <visualize:Plot2 x:Name="graph2" Margin="20,20,20,20">
                     </visualize:Plot2>
                     <visualize:Plot2 x:Name="graph3" Margin="20,20,20,20">
                     </visualize:Plot2>
                     </StackPanel>
-                    <DockPanel DockPanel.Dock="Right" Margin="0,5,5,0">
+                    <DockPanel DockPanel.Dock="Right" Margin="0,5,5,0" x:Name="Dock1" >
                         <TextBlock DockPanel.Dock="Top"  x:Name="dbg" Height="120" Margin="0,0,0,0" Style="{StaticResource T2}" Effect="{StaticResource E4}" Background="#DDFFFFFF">aaa</TextBlock>
                         <visualize:DT x:Name="dt" DockPanel.Dock="Bottom" ></visualize:DT>
                     </DockPanel>

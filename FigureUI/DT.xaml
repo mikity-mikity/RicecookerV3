@@ -19,10 +19,10 @@
             </Style>
         </ResourceDictionary>
     </UserControl.Resources>
-    <StackPanel Width="Auto" Height="Auto" >
+    <StackPanel Width="Auto" Height="Auto" Background="LightCoral" >
         
-        <Label DockPanel.Dock="Top" HorizontalAlignment="Center" Background="LightCoral" FontFamily="Arial" FontSize="16">Step Size</Label>
-        <DockPanel DockPanel.Dock="Bottom" HorizontalAlignment="Center" Background="AntiqueWhite">
+        <Label DockPanel.Dock="Top"   FontFamily="Arial" FontSize="16" HorizontalAlignment="Center"  >Step Size</Label>
+        <DockPanel DockPanel.Dock="Bottom" HorizontalAlignment="Center" >
         <RadioButton Checked="RadioButton_Checked" Style="{StaticResource T1}">0.0125</RadioButton>
             <RadioButton Checked="RadioButton_Checked" Style="{StaticResource T1}">0.025</RadioButton>
             <RadioButton Checked="RadioButton_Checked" Style="{StaticResource T1}">0.05</RadioButton>

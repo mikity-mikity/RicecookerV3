@@ -14,6 +14,7 @@ namespace mikity.ghComponents
 
     public class GH_FriedChikenMainLoop : Grasshopper.Kernel.GH_Component
     {
+        public static bool DEV = false;
         Func<double, double> Drift0 = (v) => { return 0.98; };
         Func<double, double> Drift1 = (v) => { /*if (v > 0)*/ return v / 20d + 0.95; /*else return 0.95;*/ };
 
@@ -113,7 +114,7 @@ namespace mikity.ghComponents
                 keyboardHook.Uninstall();
 
                 keyboardHook.Install();
-                full = new mikity.visualize.fullScreen();
+                full = new mikity.visualize.fullScreen(DEV);
                 full.deactivate();
                 full.Show();
                 full.resetGo();
@@ -150,89 +151,92 @@ namespace mikity.ghComponents
         System.Random rand = new Random();
         bool keyboardHook_KeyUp(RamGecTools.KeyboardHook.VKeys key)
         {
-            if (key == RamGecTools.KeyboardHook.VKeys.KEY_F)
+            if (DEV)
             {
-                
-                for(int i=0;i<FriedChiken.nParticles;i++)
+                if (key == RamGecTools.KeyboardHook.VKeys.KEY_F)
                 {
-                    FriedChiken.x[i * 3 + 0] += (rand.NextDouble() - 0.5) * 50d;
-                    FriedChiken.x[i * 3 + 1] += (rand.NextDouble() - 0.5) * 50d;
-                    FriedChiken.x[i * 3 + 2] += (rand.NextDouble() - 0.5) * 50d;
-                }
-                return true;
-            }
 
-            if (key == RamGecTools.KeyboardHook.VKeys.KEY_R)
-            {
-                if (_RP)
-                {
-                    _RP = false;
-                    full.offRF();
+                    for (int i = 0; i < FriedChiken.nParticles; i++)
+                    {
+                        FriedChiken.x[i * 3 + 0] += (rand.NextDouble() - 0.5) * 50d;
+                        FriedChiken.x[i * 3 + 1] += (rand.NextDouble() - 0.5) * 50d;
+                        FriedChiken.x[i * 3 + 2] += (rand.NextDouble() - 0.5) * 50d;
+                    }
+                    return true;
                 }
-                else
-                {
-                    _RP = true;
-                    full.onRF();
-                }
-                return true;
-            }
 
-            if (key == RamGecTools.KeyboardHook.VKeys.KEY_N)
-            {
-                if (_normalize)
+                if (key == RamGecTools.KeyboardHook.VKeys.KEY_R)
                 {
-                    _normalize = false;
-                    full.offNorm();
+                    if (_RP)
+                    {
+                        _RP = false;
+                        full.offRF();
+                    }
+                    else
+                    {
+                        _RP = true;
+                        full.onRF();
+                    }
+                    return true;
                 }
-                else
-                {
-                    _normalize = true;
-                    full.onNorm();
-                }
-                return true;
-            }
 
-            if (key == RamGecTools.KeyboardHook.VKeys.KEY_H)
-            {
-                if (_geodesic)
+                if (key == RamGecTools.KeyboardHook.VKeys.KEY_N)
                 {
-                    _geodesic = false;
-                    full.offGeo();
+                    if (_normalize)
+                    {
+                        _normalize = false;
+                        full.offNorm();
+                    }
+                    else
+                    {
+                        _normalize = true;
+                        full.onNorm();
+                    }
+                    return true;
                 }
-                else
-                {
-                    _geodesic = true;
-                    full.onGeo();
-                }
-                return true;
-            }
 
-            if (key == RamGecTools.KeyboardHook.VKeys.KEY_A)
-            {
-                if (_drift1)
+                if (key == RamGecTools.KeyboardHook.VKeys.KEY_H)
                 {
-                    _drift1 = false;
-                    _drift2 = true;
-                    full.drift2();
-                    full.renewPlot(Drift2);
+                    if (_geodesic)
+                    {
+                        _geodesic = false;
+                        full.offGeo();
+                    }
+                    else
+                    {
+                        _geodesic = true;
+                        full.onGeo();
+                    }
+                    return true;
                 }
-                else if (_drift2)
-                {
-                    _drift1 = false;
-                    _drift2 = false;
-                    full.drift0();
-                    full.renewPlot(Drift0);
-                }
-                else
-                {
-                    _drift1 = true;
-                    _drift2 = false;
-                    full.drift1();
-                    full.renewPlot(Drift1);
-                }
-                return true;
-            }
 
+                if (key == RamGecTools.KeyboardHook.VKeys.KEY_A)
+                {
+                    if (_drift1)
+                    {
+                        _drift1 = false;
+                        _drift2 = true;
+                        full.drift2();
+                        full.renewPlot(Drift2);
+                    }
+                    else if (_drift2)
+                    {
+                        _drift1 = false;
+                        _drift2 = false;
+                        full.drift0();
+                        full.renewPlot(Drift0);
+                    }
+                    else
+                    {
+                        _drift1 = true;
+                        _drift2 = false;
+                        full.drift1();
+                        full.renewPlot(Drift1);
+                    }
+                    return true;
+                }
+
+            }
 
             if (key == RamGecTools.KeyboardHook.VKeys.ESCAPE)
             {
@@ -277,26 +281,29 @@ namespace mikity.ghComponents
 
         bool keyboardHook_KeyDown(RamGecTools.KeyboardHook.VKeys key)
         {
-            if (key == RamGecTools.KeyboardHook.VKeys.KEY_F)
+            if (DEV)
             {
-                return true;
-            }
-            if (key == RamGecTools.KeyboardHook.VKeys.KEY_R)
-            {
-                return true;
-            }
-            if (key == RamGecTools.KeyboardHook.VKeys.KEY_N)
-            {
-                return true;
-            }
-            if (key == RamGecTools.KeyboardHook.VKeys.KEY_H)
-            {
-                return true;
-            }
+                if (key == RamGecTools.KeyboardHook.VKeys.KEY_F)
+                {
+                    return true;
+                }
+                if (key == RamGecTools.KeyboardHook.VKeys.KEY_R)
+                {
+                    return true;
+                }
+                if (key == RamGecTools.KeyboardHook.VKeys.KEY_N)
+                {
+                    return true;
+                }
+                if (key == RamGecTools.KeyboardHook.VKeys.KEY_H)
+                {
+                    return true;
+                }
 
-            if (key == RamGecTools.KeyboardHook.VKeys.KEY_A)
-            {
-                return true;
+                if (key == RamGecTools.KeyboardHook.VKeys.KEY_A)
+                {
+                    return true;
+                }
             }
             if (key == RamGecTools.KeyboardHook.VKeys.ESCAPE)
             {

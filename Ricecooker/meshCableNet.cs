@@ -46,6 +46,7 @@ namespace mikity.ghComponents
         {
             pManager.AddGenericParameter("Particle System", "pS", "Particle System", Grasshopper.Kernel.GH_ParamAccess.item);
             pManager.Register_PointParam("Points", "P", "Particle System",Grasshopper.Kernel.GH_ParamAccess.list);
+            pManager.Register_CurveParam("Boundary","B","Boundary", Grasshopper.Kernel.GH_ParamAccess.item);
         }
         public override void BakeGeometry(Rhino.RhinoDoc doc, Rhino.DocObjects.ObjectAttributes att, List<Guid> obj_ids)
         {
@@ -77,16 +78,30 @@ namespace mikity.ghComponents
                 lGeometry.Clear();
                 lGeometry2.Clear();
                 var ms = mikity.GeometryProcessing.MeshStructure.CreateFrom(m);
+                
                 var edges=ms.edges();
-
+                var boundary = new Rhino.Geometry.Polyline();
                 newNodes.Clear();
                 newNodes.AddRange(m.Vertices.ToPoint3dArray());
                 int nNewNodes = newNodes.Count;
                 el = new List<int[]>();
                 foreach (var e in edges)
                 {
-                    el.Add(new int[2] { e.P.N, e.next.P.N });
+                    if (!e.isNaked)
+                    {
+                        el.Add(new int[2] { e.P.N, e.next.P.N });
+                    }
                 }
+                var s = ms.boundaryStart.hf_begin;
+                do
+                {
+                    var P=m.Vertices[s.P.N];
+                    boundary.Add(new Rhino.Geometry.Point3d(P.X,P.Y,P.Z));
+                    s = s.next.P.hf_begin;
+                } while (s.P!= ms.boundaryStart);
+
+                boundary.Add(new Rhino.Geometry.Point3d(boundary[0]));
+                var boundary2 = new Rhino.Geometry.PolylineCurve(boundary);
                 bool isJoin = false;
                 mikity.NumericalMethodHelper.particle[] particles = new mikity.NumericalMethodHelper.particle[nNewNodes];
                 for (int i = 0; i < nNewNodes; i++)
@@ -114,6 +129,7 @@ namespace mikity.ghComponents
                 pS.BKGT = GetBKGT(lGeometry2);
                 DA.SetData(0, pS);
                 DA.SetDataList(1, newNodes);
+                DA.SetData(2, boundary);
                 GH_material mat = null;
                 GH_gravity gvt = null;
                 if (!DA.GetData(1, ref mat)) { return; }

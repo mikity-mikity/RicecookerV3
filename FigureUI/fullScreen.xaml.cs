@@ -34,8 +34,38 @@ namespace mikity.visualize
         public fullScreen()
         {
             InitializeComponent();
+            init(false);
+        }
+        public fullScreen(bool dev)
+        {
+            InitializeComponent();
+            init(dev);
+        }
+        public void init(bool dev)
+        {
             drift0();
             setDbgText("Test");
+            if (!dev)
+            {
+                stack1.Visibility = System.Windows.Visibility.Collapsed;
+                stack2.Visibility = System.Windows.Visibility.Collapsed;
+                stack3.Visibility = System.Windows.Visibility.Collapsed;
+                dbg.Visibility = System.Windows.Visibility.Collapsed;
+                Dock0.Children.Remove(TT);
+                Dock1.Children.Add(TT);
+                dt.SetValue(DockPanel.DockProperty, Dock.Right);
+                TT.SetValue(DockPanel.DockProperty, Dock.Left);
+                window.SizeChanged += window_SizeChanged;
+            }
+        }
+
+        void window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (sender == window)
+            {
+                view.Width=e.NewSize.Width / 2;
+                dockPanel1.Width = e.NewSize.Width / 2;
+            }
         }
         public void addNorm(double v,double v2)
         {
