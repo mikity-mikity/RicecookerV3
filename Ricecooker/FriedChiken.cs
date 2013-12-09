@@ -14,11 +14,12 @@ namespace mikity.ghComponents
 
     public class GH_FriedChikenMainLoop : Grasshopper.Kernel.GH_Component
     {
-        public static bool DEV = false;
+        public static bool DEV = true;
         Func<double, double> Drift0 = (v) => { return 0.98; };
         Func<double, double> Drift1 = (v) => { /*if (v > 0)*/ return v / 20d + 0.95; /*else return 0.95;*/ };
 
         Func<double, double> Drift2 = (v) => { if (v >=0)return 1.0; else return 0.0; };
+        Func<double, double> Drift3 = (v) => { return 1.0; };
 
         mikity.visualize.fullScreen full;
         protected override System.Drawing.Bitmap Icon
@@ -165,6 +166,20 @@ namespace mikity.ghComponents
                     return true;
                 }
 
+                if (key == RamGecTools.KeyboardHook.VKeys.KEY_E)
+                {
+                    if (_IF)
+                    {
+                        _IF = false;
+                        full.offIF();
+                    }
+                    else
+                    {
+                        _IF = true;
+                        full.onIF();
+                    }
+                    return true;
+                }
                 if (key == RamGecTools.KeyboardHook.VKeys.KEY_R)
                 {
                     if (_RP)
@@ -216,6 +231,7 @@ namespace mikity.ghComponents
                     {
                         _drift1 = false;
                         _drift2 = true;
+                        _drift3 = false;
                         full.drift2();
                         full.renewPlot(Drift2);
                     }
@@ -223,6 +239,15 @@ namespace mikity.ghComponents
                     {
                         _drift1 = false;
                         _drift2 = false;
+                        _drift3 = true;
+                        full.drift3();
+                        full.renewPlot(Drift3);
+                    }
+                    else if (_drift3)
+                    {
+                        _drift1 = false;
+                        _drift2 = false;
+                        _drift3 = false;
                         full.drift0();
                         full.renewPlot(Drift0);
                     }
@@ -230,6 +255,7 @@ namespace mikity.ghComponents
                     {
                         _drift1 = true;
                         _drift2 = false;
+                        _drift3 = false;
                         full.drift1();
                         full.renewPlot(Drift1);
                     }
@@ -283,6 +309,10 @@ namespace mikity.ghComponents
         {
             if (DEV)
             {
+                if (key == RamGecTools.KeyboardHook.VKeys.KEY_E)
+                {
+                    return true;
+                }
                 if (key == RamGecTools.KeyboardHook.VKeys.KEY_F)
                 {
                     return true;
@@ -405,7 +435,7 @@ namespace mikity.ghComponents
             }*/
         }
         private bool _go = false;
-        private bool _drift1 = true, _drift2 = false,_RP=true;
+        private bool _drift1 = true, _drift2 = false, _drift3 = false, _RP = true, _IF = true;
         private bool _normalize = true;
         private bool _geodesic = true;
         List<string> output;
@@ -599,6 +629,10 @@ namespace mikity.ghComponents
                     {
                         var jacob = ShoNS.Array.DoubleArray.From(FriedChiken.getJacobian().rawData);
                         var omega = ShoNS.Array.DoubleArray.From(FriedChiken.omega.rawData);
+                        if (_IF)
+                        {
+                            omega = ShoNS.Array.DoubleArray.Zeros(omega.Length);
+                        }
                         jacob = jacob.T;
                         omega = omega.T;
                         var solver = new ShoNS.Array.Solver(jacob);
@@ -662,11 +696,15 @@ namespace mikity.ghComponents
                     {
                         damping = Drift2(f);
                     }
+                    else if (_drift3)
+                    {
+                        damping = Drift3(f);
+                    }
                     else
                     {
                         damping = Drift0(f);
                     }
-
+                    
                     full.move(f);
 
                     dbg = "damping:" + damping.ToString() + "\n" + "dt:" + dt.ToString() + "\n" + "Step#:"+t.ToString();

@@ -15,7 +15,7 @@
             <Style x:Key="T1" TargetType="Label">
                 <Setter Property="HorizontalAlignment" Value="Center"/>
                 <Setter Property="FontWeight"   Value="Bold"/>
-                <Setter Property="FontSize" Value="24"/>
+                <Setter Property="FontSize" Value="18"/>
                 <Setter Property="FontFamily" Value="Arial"/>
                 <Setter Property="Foreground" Value="White"/>
                 <Setter Property="Width" Value="Auto"/>
@@ -57,9 +57,11 @@
 
                         <Label Name="_norm1" Style="{StaticResource T1}" Effect="{StaticResource E1}">Normalize (N key)</Label>
                         <Label Name="_norm2" Style="{StaticResource T1}" Effect="{StaticResource E2}">On</Label>
-                    
+
                         <Label Name="_geo1" Style="{StaticResource T1}" Effect="{StaticResource E1}">Geodesic (H key)</Label>
                         <Label Name="_geo2" Style="{StaticResource T1}" Effect="{StaticResource E2}">On</Label>
+                        <Label Name="_if1" Style="{StaticResource T1}" Effect="{StaticResource E1}">Ignore force (E key)</Label>
+                        <Label Name="_if2" Style="{StaticResource T1}" Effect="{StaticResource E2}">On</Label>
                     </StackPanel>
                     <StackPanel x:Name="stack3">
                     <visualize:Plot2 x:Name="graph2" Margin="20,20,20,20">

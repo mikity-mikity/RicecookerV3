@@ -105,6 +105,16 @@ namespace mikity.visualize
             _norm2.Content = "OFF";
             _norm2.Effect = (System.Windows.Media.Effects.Effect)this.FindResource("E2");
         }
+        public void onIF()
+        {
+            _if2.Content = "ON";
+            _if2.Effect = (System.Windows.Media.Effects.Effect)this.FindResource("E3");
+        }
+        public void offIF()
+        {
+            _if2.Content = "OFF";
+            _if2.Effect = (System.Windows.Media.Effects.Effect)this.FindResource("E2");
+        }
         public void onGeo()
         {
             _geo2.Content = "ON";
@@ -142,6 +152,11 @@ namespace mikity.visualize
         public void drift2()
         {
             _drift2.Content = "Kinetic";
+            _drift2.Effect = (System.Windows.Media.Effects.Effect)this.FindResource("E3");
+        }
+        public void drift3()
+        {
+            _drift2.Content = "None";
             _drift2.Effect = (System.Windows.Media.Effects.Effect)this.FindResource("E3");
         }
         public void move(double val)
