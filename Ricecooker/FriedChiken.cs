@@ -14,7 +14,7 @@ namespace mikity.ghComponents
 
     public class GH_FriedChikenMainLoop : Grasshopper.Kernel.GH_Component
     {
-        public static bool DEV = false;
+        public static bool DEV = true;
         Func<double, double> Drift0 = (v) => { return 0.98; };
         Func<double, double> Drift1 = (v) => { /*if (v > 0)*/ return v / 20d + 0.95; /*else return 0.95;*/ };
 
@@ -409,6 +409,54 @@ namespace mikity.ghComponents
         private bool _normalize = true;
         private bool _geodesic = true;
         List<string> output;
+        private void phi()
+        {
+            var jacob = ShoNS.Array.DoubleArray.From(FriedChiken.getJacobian().rawData);
+            var omega = ShoNS.Array.DoubleArray.From(FriedChiken.omega.rawData);
+            jacob = jacob.T;
+            omega = omega.T;
+            var solver = new ShoNS.Array.Solver(jacob);
+            var _lambda = solver.Solve(omega);
+            _lambda.CopyTo(lambda, 0);
+            FriedChiken.omega.xminusyA(FriedChiken.omega, lambda, FriedChiken.getJacobian());
+
+        }
+        private void varphi()
+        {
+            double norm = FriedChiken.q.norm;                            
+            matrix.y_equals_Ax(FriedChiken.getJacobian(), FriedChiken.q, qr);
+            var jacob = ShoNS.Array.DoubleArray.From(FriedChiken.getJacobian().rawData);
+            var _qr = ShoNS.Array.DoubleArray.From(qr.rawData).T;
+            var solve = new ShoNS.Array.Solver(jacob);
+            var z = solve.Solve(_qr);
+            double[] _qo = qo.rawData;
+            z.CopyTo(_qo, 0);
+            FriedChiken.q.Subtract(qo);
+            if (FriedChiken.q.norm != 0)
+            {
+                FriedChiken.q.dividedby(FriedChiken.q.norm);
+                FriedChiken.q.times(norm);
+            }
+        }
+
+        private void psi()
+        {
+            FriedChiken.Tick(t);//要素アップデート、勾配の計算
+            FriedChiken.Tack(t);//マスク等後処理
+
+            for (int s = 0; s < 50; s++)
+            {
+                var ff = ShoNS.Array.DoubleArray.From(FriedChiken.getJacobian().rawData);
+                var g = ShoNS.Array.DoubleArray.From(FriedChiken.getResidual().rawData).T;
+                var solver = new ShoNS.Array.Solver(ff);
+                var _dx = solver.Solve(g);
+                _dx.CopyTo(dx.rawData, 0);
+                FriedChiken.x.Subtract(1.0, dx);
+                FriedChiken.Tick(t);//要素アップデート、勾配の計算
+                FriedChiken.Tack(t);//マスク等後処理
+                if (FriedChiken.getResidual().norm < 0.0001) break;
+            }
+        }
         private void Menu_MyCustomItemClicked(Object sender, EventArgs e)
         {
             System.Windows.Forms.ToolStripMenuItem __m = sender as System.Windows.Forms.ToolStripMenuItem;
@@ -595,49 +643,18 @@ namespace mikity.ghComponents
                     stw.Start();
                     FriedChiken.Tick(t);//要素アップデート、勾配の計算
                     FriedChiken.Tack(t);//マスク等後処理
-                    if (FriedChiken.numCond > 0)
-                    {
-                        var jacob = ShoNS.Array.DoubleArray.From(FriedChiken.getJacobian().rawData);
-                        var omega = ShoNS.Array.DoubleArray.From(FriedChiken.omega.rawData);
-                        jacob = jacob.T;
-                        omega = omega.T;
-                        var solver = new ShoNS.Array.Solver(jacob);
-                        var _lambda = solver.Solve(omega);
-                        _lambda.CopyTo(lambda, 0);
-
-                        FriedChiken.omega.xminusyA(FriedChiken.omega, lambda, FriedChiken.getJacobian());
-                    }
+                    if (FriedChiken.numCond > 0) phi();
                     string tmp = "\t" + t.ToString() + "\t";
-                    var v = DoubleArray.From(FriedChiken.q.rawData);
                     tmp += FriedChiken.omega.norm.ToString() + "\t";
-                    
-                    if (_geodesic == true)
-                    {
-                        if (FriedChiken.numCond > 0)
-                        {
-                            //double norm = FriedChiken.q.norm;                            
-                            matrix.y_equals_Ax(FriedChiken.getJacobian(), FriedChiken.q, qr);
-                            var jacob = ShoNS.Array.DoubleArray.From(FriedChiken.getJacobian().rawData);
-                            var _qr = ShoNS.Array.DoubleArray.From(qr.rawData).T;
-                            var solve = new ShoNS.Array.Solver(jacob);
-                            var z = solve.Solve(_qr);
-                            double[] _qo = qo.rawData;
-                            z.CopyTo(_qo, 0);
-                            FriedChiken.q.Subtract(qo);
-                            /*if (FriedChiken.q.norm != 0)
-                            {
-                                FriedChiken.q.dividedby(FriedChiken.q.norm);
-                                FriedChiken.q.times(norm);
-                            }*/
 
-                        }
-                    }
-                    var a = DoubleArray.From(FriedChiken.omega.rawData);
+                    if (_geodesic) if (FriedChiken.numCond > 0) varphi();
+                    var v = DoubleArray.From(FriedChiken.q.rawData);
                     double normW=FriedChiken.omega.norm;
                     if (_normalize == true)
                     {
-                            FriedChiken.omega.dividedby(normW);//力を加速度に
+                            FriedChiken.omega.dividedby(normW);//力を正規化
                     }
+                    var a = DoubleArray.From(FriedChiken.omega.rawData);
 
                     FriedChiken.omega.MinusTo(FriedChiken.r);//力を加速度に
                     double norm1 = (v * v.T)[0, 0];
@@ -666,34 +683,13 @@ namespace mikity.ghComponents
                     {
                         damping = Drift0(f);
                     }
-
                     full.move(f);
-
                     dbg = "damping:" + damping.ToString() + "\n" + "dt:" + dt.ToString() + "\n" + "Step#:"+t.ToString();
                     full.setDbgText(dbg);
                     FriedChiken.q.times(damping).Add(dt, FriedChiken.r);
                     double normQ = FriedChiken.q.norm;
-
                     FriedChiken.x.Add(dt, FriedChiken.q);
-                    int __s = 0;
-                    if (FriedChiken.numCond > 0)
-                    {
-                        FriedChiken.Tick(t);//要素アップデート、勾配の計算
-                        FriedChiken.Tack(t);//マスク等後処理
-
-                        for (__s = 0; __s < 50; __s++)
-                        {
-                            var ff = ShoNS.Array.DoubleArray.From(FriedChiken.getJacobian().rawData);
-                            var g = ShoNS.Array.DoubleArray.From(FriedChiken.getResidual().rawData).T;
-                            var solver = new ShoNS.Array.Solver(ff);
-                            var _dx = solver.Solve(g);
-                            _dx.CopyTo(dx.rawData, 0);
-                            FriedChiken.x.Subtract(1.0, dx);
-                            FriedChiken.Tick(t);//要素アップデート、勾配の計算
-                            FriedChiken.Tack(t);//マスク等後処理
-                            if (FriedChiken.getResidual().norm < 0.0001) break;
-                        }
-                    }
+                    if (FriedChiken.numCond > 0) psi();
                     full.addNorm(normW, normQ);
 
                     stw.Stop();
