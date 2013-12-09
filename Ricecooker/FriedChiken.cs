@@ -673,26 +673,7 @@ namespace mikity.ghComponents
                     stw.Start();
                     FriedChiken.Tick(t);//要素アップデート、勾配の計算
                     FriedChiken.Tack(t);//マスク等後処理
-<<<<<<< HEAD
-                    if (FriedChiken.numCond > 0)
-                    {
-                        var jacob = ShoNS.Array.DoubleArray.From(FriedChiken.getJacobian().rawData);
-                        var omega = ShoNS.Array.DoubleArray.From(FriedChiken.omega.rawData);
-                        if (_IF)
-                        {
-                            omega = ShoNS.Array.DoubleArray.Zeros(omega.Length);
-                        }
-                        jacob = jacob.T;
-                        omega = omega.T;
-                        var solver = new ShoNS.Array.Solver(jacob);
-                        var _lambda = solver.Solve(omega);
-                        _lambda.CopyTo(lambda, 0);
-
-                        FriedChiken.omega.xminusyA(FriedChiken.omega, lambda, FriedChiken.getJacobian());
-                    }
-=======
                     if (FriedChiken.numCond > 0) phi();
->>>>>>> 9befdd26c3ca3e76dc5546a0442e6a6b61bfb232
                     string tmp = "\t" + t.ToString() + "\t";
                     tmp += FriedChiken.omega.norm.ToString() + "\t";
 
@@ -736,10 +717,6 @@ namespace mikity.ghComponents
                     {
                         damping = Drift0(f);
                     }
-<<<<<<< HEAD
-                    
-=======
->>>>>>> 9befdd26c3ca3e76dc5546a0442e6a6b61bfb232
                     full.move(f);
                     dbg = "damping:" + damping.ToString() + "\n" + "dt:" + dt.ToString() + "\n" + "Step#:"+t.ToString();
                     full.setDbgText(dbg);
