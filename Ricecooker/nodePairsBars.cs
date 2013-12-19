@@ -138,7 +138,7 @@ namespace mikity.ghComponents
             return new BakeGeometry((d, a, o) =>
             {
                 Rhino.DocObjects.ObjectAttributes a2 = a.Duplicate();
-                a2.LayerIndex = 3;
+                a2.LayerIndex = 4;
                 foreach (Rhino.Geometry.Line l in m)
                 {
                     o.Add(d.Objects.AddLine(l, a2));

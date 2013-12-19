@@ -56,10 +56,19 @@ namespace mikity.ghComponents
             }
             base.DrawViewportWires(args);
         }
+        public override void BakeGeometry(Rhino.RhinoDoc doc, Rhino.DocObjects.ObjectAttributes att, List<Guid> obj_ids)
+        {
+            if (this.BKGT != null)
+            {
+                this.BKGT(doc, att, obj_ids);
+            }
+            base.BakeGeometry(doc, att, obj_ids);
+        }
         private const int _nNodes = 2;
         private const int _dim = 1;
         GH_particleSystem pS;
         DrawViewPortWire DVPW = null;
+        BakeGeometry BKGT = null;
         mikity.NumericalMethodHelper.objects.constrainVolumeObject cV;
         Rhino.Geometry.Polyline lGeometry=new Rhino.Geometry.Polyline();
         Rhino.Geometry.Polyline lGeometry2 = new Rhino.Geometry.Polyline();
@@ -90,8 +99,10 @@ namespace mikity.ghComponents
                 lGeometry2.Add(particles[1][0], particles[1][1], particles[1][2]);
                 
                 this.DVPW = GetDVPW(lGeometry);
+                this.BKGT = GetBKGT(lGeometry); 
                 pS.DVPW = GetDVPW(lGeometry2);
                 pS.UPGR = GetUPGR(lGeometry2);
+                pS.BKGT = GetBKGT(lGeometry2);
             }
             else
             {
@@ -103,6 +114,15 @@ namespace mikity.ghComponents
             }
 
             DA.SetData(0, pS);
+        }
+        public BakeGeometry GetBKGT(Rhino.Geometry.Polyline m)
+        {
+            return new BakeGeometry((d, a, o) =>
+            {
+                Rhino.DocObjects.ObjectAttributes a2 = a.Duplicate();
+                a2.LayerIndex = 4;
+                o.Add(d.Objects.AddPolyline(m, a2));
+            });
         }
         public UpdateGeometry GetUPGR(Rhino.Geometry.Polyline m)
         {
