@@ -96,6 +96,16 @@ namespace mikity.visualize
             _rf2.Content = "OFF";
             _rf2.Effect = (System.Windows.Media.Effects.Effect)this.FindResource("E2");
         }
+        public void onVN()
+        {
+            _vn2.Content = "ON";
+            _vn2.Effect = (System.Windows.Media.Effects.Effect)this.FindResource("E3");
+        }
+        public void offVN()
+        {
+            _vn2.Content = "OFF";
+            _vn2.Effect = (System.Windows.Media.Effects.Effect)this.FindResource("E2");
+        }
         public void onNorm()
         {
             _norm2.Content = "ON";

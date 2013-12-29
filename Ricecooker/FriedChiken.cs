@@ -74,6 +74,7 @@ namespace mikity.ghComponents
             full.onRF();
             full.onNorm();
             full.onGeo();
+            full.offVN();
         }
         
         public override void RemovedFromDocument(Grasshopper.Kernel.GH_Document document)
@@ -124,6 +125,7 @@ namespace mikity.ghComponents
                 full.onRF();
                 full.onNorm();
                 full.onGeo();
+                full.offVN();
             }
             if (context == Grasshopper.Kernel.GH_DocumentContext.Unloaded)
             {
@@ -302,6 +304,20 @@ namespace mikity.ghComponents
                 }
                 return true;
             }
+            if (key == RamGecTools.KeyboardHook.VKeys.KEY_T)
+            {
+                if (_VN)
+                {
+                    _VN = false;
+                    full.offVN();
+                }
+                else
+                {
+                    _VN = true;
+                    full.onVN();
+                }
+                return true;
+            }
             return false;
         }
 
@@ -343,6 +359,10 @@ namespace mikity.ghComponents
             {
                 return true;
             }
+            if (key == RamGecTools.KeyboardHook.VKeys.KEY_T)
+            {
+                return true;
+            }
             return false;
         }
         void timer_Tick(object sender, EventArgs e)
@@ -376,6 +396,16 @@ namespace mikity.ghComponents
                     }
                 }
             }
+            if(_VN)
+            {
+                var x=FriedChiken.getParticles();
+                for (int i = 0; i < FriedChiken.nParticles; i++)
+                {
+                    Rhino.DocObjects.ObjectAttributes a2 = att.Duplicate();
+                    a2.LayerIndex = 2;
+                    obj_ids.Add(doc.Objects.AddTextDot(new Rhino.Geometry.TextDot(i.ToString("000"),new Rhino.Geometry.Point3d(x[i, 0] + __dist, x[i, 1], x[i, 2])),a2));
+                }
+            }
             base.BakeGeometry(doc, att, obj_ids);
         }
 
@@ -391,6 +421,14 @@ namespace mikity.ghComponents
                         if (pS.DVPW != null)
                         {
                             pS.DVPW(args);
+                        }
+                    }
+                    var x=FriedChiken.getParticles();
+                    if (_VN)
+                    {
+                        for (int i = 0; i < FriedChiken.nParticles; i++)
+                        {
+                            args.Display.Draw2dText(i.ToString("000"), System.Drawing.Color.Red, new Rhino.Geometry.Point3d(x[i, 0] + __dist, x[i, 1], x[i, 2]), true);
                         }
                     }
                 }
@@ -438,6 +476,7 @@ namespace mikity.ghComponents
         private bool _drift1 = true, _drift2 = false, _drift3 = false, _RP = true, _IF = true;
         private bool _normalize = true;
         private bool _geodesic = true;
+        private bool _VN = false;
         List<string> output;
         private void phi()
         {

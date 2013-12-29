@@ -62,6 +62,8 @@
                         <Label Name="_geo2" Style="{StaticResource T1}" Effect="{StaticResource E2}">On</Label>
                         <Label Name="_if1" Style="{StaticResource T1}" Effect="{StaticResource E1}">Ignore force (E key)</Label>
                         <Label Name="_if2" Style="{StaticResource T1}" Effect="{StaticResource E2}">On</Label>
+                        <Label Name="_vn1" Style="{StaticResource T1}" Effect="{StaticResource E1}">Show node# (T key)</Label>
+                        <Label Name="_vn2" Style="{StaticResource T1}" Effect="{StaticResource E2}">Off</Label>
                     </StackPanel>
                     <StackPanel x:Name="stack3">
                     <visualize:Plot2 x:Name="graph2" Margin="20,20,20,20">
