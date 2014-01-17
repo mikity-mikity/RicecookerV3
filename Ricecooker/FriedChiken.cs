@@ -14,7 +14,7 @@ namespace mikity.ghComponents
 
     public class GH_FriedChikenMainLoop : Grasshopper.Kernel.GH_Component
     {
-        public static bool DEV = false;
+        public static bool DEV = true;
         Func<double, double> Drift0 = (v) => { return 0.98; };
         Func<double, double> Drift1 = (v) => { /*if (v > 0)*/ return v / 20d + 0.95; /*else return 0.95;*/ };
 
