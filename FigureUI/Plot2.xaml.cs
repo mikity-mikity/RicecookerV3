@@ -73,7 +73,7 @@ namespace mikity.visualize
             minLine.Y1 = converterY(aMinY);
             minLine.Y2 = converterY(aMinY);
             min.Content = aMinY.ToString("G3");
-            for (int i = 0; i < 80; i++)
+            /*for (int i = 0; i < 80; i++)
             {
                 lines[i].X1=converterX(i+minX);
                 if(i+minX>maxX)
@@ -93,7 +93,7 @@ namespace mikity.visualize
                 {
                     lines[i].Y2=converterY(vals[i+1+minX]);
                 }
-            }
+            }*/
         }
         Line[] lines = new Line[80];
         public Plot2()

@@ -70,8 +70,8 @@ namespace mikity.visualize
         }
         public void addNorm(double v,double v2)
         {
-            this.graph2.add(v);
-            this.graph3.add(v2);
+            //this.graph2.add(v);
+            //this.graph3.add(v2);
         }
         public void clearNorm()
         {
