@@ -417,7 +417,7 @@ namespace mikity.NumericalMethodHelper.materials
             m_mat = new material((_e, _i) =>
             {
                 double n = this.Power * this.Weight * Math.Pow(_e.Volume, this.Power - 1);
-                _i.energyDensity=n;
+                _i.energyDensity = this.Weight*Math.Pow(_e.Volume,this.Power-1);
                 return _i.stress2.zeros().plus_xA(n, _i.invMetric);
             });
 

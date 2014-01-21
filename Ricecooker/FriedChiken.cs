@@ -720,6 +720,8 @@ namespace mikity.ghComponents
                     {
                         FriedChiken.omega.zeros();
                     }
+                    double resid = FriedChiken.getResidual().norm;
+                    
                     if (FriedChiken.numCond > 0) phi();
                     string tmp = "\t" + t.ToString() + "\t";
                     tmp += FriedChiken.omega.norm.ToString() + "\t";
@@ -776,7 +778,7 @@ namespace mikity.ghComponents
                     int itr = 0;
                     FriedChiken.x.Add(dt, FriedChiken.q);
                     if (FriedChiken.numCond > 0) itr=psi();
-                    full.addNorm(K, E,itr,normW);
+                    full.addNorm(K, E,itr,normW,resid);
 
                     stw.Stop();
                     t++;

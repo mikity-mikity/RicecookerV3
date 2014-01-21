@@ -69,6 +69,7 @@ namespace mikity.visualize
                 var d=vals.Skip(minX).Take(81);
                 minY = minY*0.9+d.Min()*0.1;
                 maxY = maxY*0.9+d.Max()*0.1;
+                if (maxY == minY) maxY = minY + 0.0001;
                 aMinY = d.Min();
             }
             converterX = (v) => { return (v - minX) / 80d * 200d; };
@@ -133,7 +134,7 @@ namespace mikity.visualize
                     var sw = new System.IO.StreamWriter(filename, false);
                     for (int i = 0; i < vals.Count; i++)
                     {
-                        sw.WriteLine((i + 1).ToString() + "," + vals[i].ToString());
+                        sw.WriteLine((i).ToString() + "," + vals[i].ToString());
                     }
                     sw.Close();
                 }

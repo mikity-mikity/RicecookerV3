@@ -68,12 +68,13 @@ namespace mikity.visualize
                 dockPanel1.Width = e.NewSize.Width / 2;
             }
         }
-        public void addNorm(double v,double v2,int v3,double v4)
+        public void addNorm(double v,double v2,int v3,double v4,double v5)
         {
             this.graph2.add(v);
             this.graph3.add(v2);
             this.graph4.add(v3);
             this.graph5.add(v4);
+            this.graph6.add(v5);
         }
         public void clearNorm()
         {

@@ -87,6 +87,10 @@
                             <visualize:Plot2 x:Name="graph4" Margin="20,20,20,20">
                             </visualize:Plot2>
                         </TabItem>
+                        <TabItem Header="Constraint Residual">
+                            <visualize:Plot2 x:Name="graph6" Margin="20,20,20,20">
+                            </visualize:Plot2>
+                        </TabItem>
                     </TabControl>
                     <DockPanel DockPanel.Dock="Right" Margin="0,5,5,0" x:Name="Dock1" >
                         <TextBlock DockPanel.Dock="Top"  x:Name="dbg" Height="120" Margin="0,0,0,0" Style="{StaticResource T2}" Effect="{StaticResource E4}" Background="#DDFFFFFF">aaa</TextBlock>

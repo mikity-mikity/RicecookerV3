@@ -513,7 +513,7 @@ namespace mikity.NumericalMethodHelper.elements
                     double* ptr1 = _ptr1;
                     double J = Math.Sqrt(_i.metric.det);
                     /*energy*/
-                    elemEnergy += _i.energyDensity * J;
+                    elemEnergy += _i.energyDensity* _i.w* J;
                     /*stress*/
                     for (int k = 0; k < this.dof; k++)
                     {
