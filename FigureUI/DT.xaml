@@ -23,7 +23,8 @@
         
         <Label DockPanel.Dock="Top"   FontFamily="Arial" FontSize="16" HorizontalAlignment="Center"  >Step Size</Label>
         <DockPanel DockPanel.Dock="Bottom" HorizontalAlignment="Center" >
-        <RadioButton Checked="RadioButton_Checked" Style="{StaticResource T1}">0.0125</RadioButton>
+            <RadioButton Checked="RadioButton_Checked" Style="{StaticResource T1}">0.001</RadioButton>
+            <RadioButton Checked="RadioButton_Checked" Style="{StaticResource T1}">0.0125</RadioButton>
             <RadioButton Checked="RadioButton_Checked" Style="{StaticResource T1}">0.025</RadioButton>
             <RadioButton Checked="RadioButton_Checked" Style="{StaticResource T1}">0.05</RadioButton>
             <RadioButton Checked="RadioButton_Checked" Style="{StaticResource T1}">0.1</RadioButton>

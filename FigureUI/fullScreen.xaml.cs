@@ -52,8 +52,8 @@ namespace mikity.visualize
                 stack2.Visibility = System.Windows.Visibility.Collapsed;
                 stack3.Visibility = System.Windows.Visibility.Collapsed;
                 dbg.Visibility = System.Windows.Visibility.Collapsed;
-                Dock0.Children.Remove(TT);
-                Dock1.Children.Add(TT);
+                //Dock0.Children.Remove(TT);
+                //Dock1.Children.Add(TT);
                 dt.SetValue(DockPanel.DockProperty, Dock.Right);
                 TT.SetValue(DockPanel.DockProperty, Dock.Left);
                 window.SizeChanged += window_SizeChanged;
@@ -68,10 +68,12 @@ namespace mikity.visualize
                 dockPanel1.Width = e.NewSize.Width / 2;
             }
         }
-        public void addNorm(double v,double v2)
+        public void addNorm(double v,double v2,int v3,double v4)
         {
-            //this.graph2.add(v);
-            //this.graph3.add(v2);
+            this.graph2.add(v);
+            this.graph3.add(v2);
+            this.graph4.add(v3);
+            this.graph5.add(v4);
         }
         public void clearNorm()
         {

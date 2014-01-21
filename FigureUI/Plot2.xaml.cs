@@ -18,7 +18,7 @@ namespace mikity.visualize
     /// <summary>
     /// Plot.xaml の相互作用ロジック
     /// </summary>
-    public partial class Plot2 : UserControl
+    public partial class Plot2 : UserControl 
     {
         List<double> vals = new List<double>();
         List<double> lastVals;
@@ -27,6 +27,11 @@ namespace mikity.visualize
         public void add(double val)
         {
             vals.Add(val);
+            update();
+        }
+        public void add(int val)
+        {
+            vals.Add((double)val);
             update();
         }
         public void Clear()
@@ -53,8 +58,8 @@ namespace mikity.visualize
             {
                 minX = 0;
                 maxX = vals.Count - 1;
-                minY = minY * 0.9 + vals.Min() * 0.1;
-                maxY = maxY * 0.9 + vals.Max() * 0.1;
+                minY = minY * 0.9 + vals.Min()*0.1;
+                maxY = maxY * 0.9 + vals.Max()*0.1;
                 aMinY = vals.Min();
             }
             else
@@ -73,7 +78,7 @@ namespace mikity.visualize
             minLine.Y1 = converterY(aMinY);
             minLine.Y2 = converterY(aMinY);
             min.Content = aMinY.ToString("G3");
-            /*for (int i = 0; i < 80; i++)
+            for (int i = 0; i < 80; i++)
             {
                 lines[i].X1=converterX(i+minX);
                 if(i+minX>maxX)
@@ -93,7 +98,7 @@ namespace mikity.visualize
                 {
                     lines[i].Y2=converterY(vals[i+1+minX]);
                 }
-            }*/
+            }
         }
         Line[] lines = new Line[80];
         public Plot2()

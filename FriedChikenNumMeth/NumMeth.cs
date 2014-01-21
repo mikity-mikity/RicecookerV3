@@ -59,6 +59,11 @@ namespace mikity.NumericalMethodHelper
         private static bool _isInit = false;
         private static int __dof = 0;
         private static bool _initializing = false;
+        public static double energy;
+        public static double getEnergy()
+        {
+            return energy;
+        }
         public static matrix getParticles()
         {
             return __particles;
@@ -251,6 +256,7 @@ namespace mikity.NumericalMethodHelper
         public static void Tick(int count)
         {
             FriedChiken.gradient.zeros();
+            FriedChiken.energy = 0;
             FriedChiken.load.zeros();
             FriedChiken.omega.zeros();
             FriedChiken.reaction.zeros();

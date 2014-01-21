@@ -433,6 +433,7 @@ namespace mikity.NumericalMethodHelper.elements
         }
         protected vector elemGrad;
         protected vector elemLoad;
+        protected double elemEnergy;
         public element(int[] _el)
             : base(_el.Length)
         {
@@ -490,6 +491,7 @@ namespace mikity.NumericalMethodHelper.elements
             //積分点のアップデート
             elemGrad.zeros();
             elemLoad.zeros();
+            elemEnergy = 0;
             integralPoint _i = null;
             //体積の計算
             double _v = 0;
@@ -510,12 +512,16 @@ namespace mikity.NumericalMethodHelper.elements
                     _i.stress.Products(_i.stress2, _i.metric);
                     double* ptr1 = _ptr1;
                     double J = Math.Sqrt(_i.metric.det);
+                    /*energy*/
+                    elemEnergy += _i.energyDensity * J;
+                    /*stress*/
                     for (int k = 0; k < this.dof; k++)
                     {
                         *ptr1 +=
                         0.5 * _i.w * J * matrix.DoubleDot(_i.stress2, _i.difMetric[k]);
                         ptr1++;
                     }
+                    /*volume force*/
                     double* ptr2 = _ptr2;
                     for (int j = 0; j < nNodes; j++)
                     {
@@ -553,8 +559,9 @@ namespace mikity.NumericalMethodHelper.elements
             }
         }
 
-        unsafe internal void Merge(particleSystem pS, vector grad,vector load)
+        unsafe internal void Merge(particleSystem pS, vector grad,vector load,ref double energy)
         {
+            energy += this.elemEnergy;
             fixed (double* _ptr1 = &elemGrad.rawData[0], _ptr2 = &elemLoad.rawData[0],_ptr3=&grad.rawData[0],_ptr4=&load.rawData[0])
             {
                 fixed (int* _ptr5 = &el.rawData[0],_ptr6=&pS.globalIndex.rawData[0],_ptr7=&FriedChiken.index.rawData[0,0])

@@ -75,6 +75,7 @@ namespace mikity.ghComponents
             full.onNorm();
             full.onGeo();
             full.offVN();
+            full.offIF();
         }
         
         public override void RemovedFromDocument(Grasshopper.Kernel.GH_Document document)
@@ -126,6 +127,7 @@ namespace mikity.ghComponents
                 full.onNorm();
                 full.onGeo();
                 full.offVN();
+                full.offIF();
             }
             if (context == Grasshopper.Kernel.GH_DocumentContext.Unloaded)
             {
@@ -473,7 +475,7 @@ namespace mikity.ghComponents
             }*/
         }
         private bool _go = false;
-        private bool _drift1 = true, _drift2 = false, _drift3 = false, _RP = true, _IF = true;
+        private bool _drift1 = true, _drift2 = false, _drift3 = false, _RP = true, _IF = false;
         private bool _normalize = true;
         private bool _geodesic = true;
         private bool _VN = false;
@@ -508,11 +510,11 @@ namespace mikity.ghComponents
             }
         }
 
-        private void psi()
+        private int psi()
         {
             FriedChiken.Tick(t);//要素アップデート、勾配の計算
             FriedChiken.Tack(t);//マスク等後処理
-
+            int itr = 0;
             for (int s = 0; s < 50; s++)
             {
                 var ff = ShoNS.Array.DoubleArray.From(FriedChiken.getJacobian().rawData);
@@ -523,8 +525,10 @@ namespace mikity.ghComponents
                 FriedChiken.x.Subtract(1.0, dx);
                 FriedChiken.Tick(t);//要素アップデート、勾配の計算
                 FriedChiken.Tack(t);//マスク等後処理
-                if (FriedChiken.getResidual().norm < 0.0001) break;
+                itr++;
+                if (FriedChiken.getResidual().norm < 0.0001) break; 
             }
+            return itr;
         }
         private void Menu_MyCustomItemClicked(Object sender, EventArgs e)
         {
@@ -712,6 +716,10 @@ namespace mikity.ghComponents
                     stw.Start();
                     FriedChiken.Tick(t);//要素アップデート、勾配の計算
                     FriedChiken.Tack(t);//マスク等後処理
+                    if (_IF)
+                    {
+                        FriedChiken.omega.zeros();
+                    }
                     if (FriedChiken.numCond > 0) phi();
                     string tmp = "\t" + t.ToString() + "\t";
                     tmp += FriedChiken.omega.norm.ToString() + "\t";
@@ -721,6 +729,7 @@ namespace mikity.ghComponents
                     double normW=FriedChiken.omega.norm;
                     if (_normalize == true)
                     {
+                        if(normW!=0)
                             FriedChiken.omega.dividedby(normW);//力を正規化
                     }
                     var a = DoubleArray.From(FriedChiken.omega.rawData);
@@ -757,13 +766,17 @@ namespace mikity.ghComponents
                         damping = Drift0(f);
                     }
                     full.move(f);
-                    dbg = "damping:" + damping.ToString() + "\n" + "dt:" + dt.ToString() + "\n" + "Step#:"+t.ToString();
+                    dbg = "damping:" + damping      .ToString() + "\n" + "dt:" + dt.ToString() + "\n" + "Step#:"+t.ToString();
                     full.setDbgText(dbg);
                     FriedChiken.q.times(damping).Add(dt, FriedChiken.r);
                     double normQ = FriedChiken.q.norm;
+                    double K = normQ * normQ * 0.5;
+                    double P = FriedChiken.energy;
+                    double E = K + P;
+                    int itr = 0;
                     FriedChiken.x.Add(dt, FriedChiken.q);
-                    if (FriedChiken.numCond > 0) psi();
-                    full.addNorm(normW, normQ);
+                    if (FriedChiken.numCond > 0) itr=psi();
+                    full.addNorm(K, E,itr,normW);
 
                     stw.Stop();
                     t++;

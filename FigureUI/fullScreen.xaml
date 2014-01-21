@@ -43,7 +43,12 @@
         <Viewbox x:Name="view" Width="auto" Height="auto" DockPanel.Dock="Top" >
             <DockPanel Height="Auto" HorizontalAlignment="Stretch" Margin="12" Name="dockPanel1" VerticalAlignment="Top" Width="1600" Background="#33FFAA55">
                 <DockPanel DockPanel.Dock="Top" x:Name="Dock0">
+                    <StackPanel Orientation="Vertical">
+                        
                     <Border x:Name="TT" Child="{StaticResource D1}" Width="240" Background="Bisque"></Border>
+                    <visualize:DT x:Name="dt" DockPanel.Dock="Bottom" ></visualize:DT>
+                    </StackPanel>
+
                     <StackPanel Orientation="Vertical" VerticalAlignment="Top" x:Name="stack1">
                         <Label Name="_drift1" Style="{StaticResource T1}" Effect="{StaticResource E1}">Damping (A key)</Label>
                         <Label Name="_drift2" Style="{StaticResource T1}" Effect="{StaticResource E2}">Viscous</Label>
@@ -65,15 +70,26 @@
                         <Label Name="_vn1" Style="{StaticResource T1}" Effect="{StaticResource E1}">Show node# (T key)</Label>
                         <Label Name="_vn2" Style="{StaticResource T1}" Effect="{StaticResource E2}">Off</Label>
                     </StackPanel>
-                    <StackPanel x:Name="stack3">
-                    <visualize:Plot2 x:Name="graph2" Margin="20,20,20,20">
-                    </visualize:Plot2>
-                    <visualize:Plot2 x:Name="graph3" Margin="20,20,20,20">
-                    </visualize:Plot2>
-                    </StackPanel>
+                    <TabControl x:Name="stack3">
+                        <TabItem Header="Kinetic">
+                            <visualize:Plot2 x:Name="graph2" Margin="20,20,20,20">
+                            </visualize:Plot2>
+                        </TabItem>
+                        <TabItem Header="Total">
+                            <visualize:Plot2 x:Name="graph3" Margin="20,20,20,20">
+                            </visualize:Plot2>
+                        </TabItem>
+                        <TabItem Header="|w|">
+                            <visualize:Plot2 x:Name="graph5" Margin="20,20,20,20">
+                            </visualize:Plot2>
+                        </TabItem>
+                        <TabItem Header="Itrs">
+                            <visualize:Plot2 x:Name="graph4" Margin="20,20,20,20">
+                            </visualize:Plot2>
+                        </TabItem>
+                    </TabControl>
                     <DockPanel DockPanel.Dock="Right" Margin="0,5,5,0" x:Name="Dock1" >
                         <TextBlock DockPanel.Dock="Top"  x:Name="dbg" Height="120" Margin="0,0,0,0" Style="{StaticResource T2}" Effect="{StaticResource E4}" Background="#DDFFFFFF">aaa</TextBlock>
-                        <visualize:DT x:Name="dt" DockPanel.Dock="Bottom" ></visualize:DT>
                     </DockPanel>
                 </DockPanel>
                 <Border DockPanel.Dock="Bottom"></Border>

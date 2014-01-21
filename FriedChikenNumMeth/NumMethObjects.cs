@@ -78,7 +78,7 @@ namespace mikity.NumericalMethodHelper.objects
 
         unsafe public void begin(particleSystem pS)
         {
-            materials.material _em = new material((_e, _i) => { return _i.stress2.zeros().plus_xA(1.0, _i.invMetric); });
+            materials.material _em = new material((_e, _i) => { _i.energyDensity = 0; return _i.stress2.zeros().plus_xA(1.0, _i.invMetric); });
             materials.gravity _gvt = new materials.zeroGravity().getGravity();
             materials.gravity gvt2 = null;
             materials.material em2 = null;
@@ -121,14 +121,11 @@ namespace mikity.NumericalMethodHelper.objects
                 }
             }
         }
-        //private IObservable<elements.element> elementObserver;
 
         public void update(particleSystem pS)
         {
             vector grad = FriedChiken.getGradient();
             vector load = FriedChiken.getLoad();
-//            var method1 = Observable.Start(() =>
-//            {
             System.Threading.Tasks.Parallel.For(0,elemList.Count,(i)=>
                 {
                     elements.element e = elemList[i];
@@ -140,7 +137,7 @@ namespace mikity.NumericalMethodHelper.objects
             for (int i = 0; i < elemList.Count; i++)
             {
                 elements.element e = elemList[i];
-                e.Merge(pS, grad, load);
+                e.Merge(pS, grad, load,ref FriedChiken.energy);
             }
 
 

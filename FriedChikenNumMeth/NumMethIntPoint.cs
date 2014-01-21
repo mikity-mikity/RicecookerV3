@@ -47,6 +47,7 @@ namespace mikity.NumericalMethodHelper
         }
         //計量、計量の逆行列、参照計量、応力(混合成分)、応力(反変成分),歪
         public matrix metric, invMetric,refMetric, refInvMetric,stress,stress2,strain;
+        public double energyDensity;
         public vector gravity;
         //計量の微分
         public matrixVector difMetric;
@@ -81,6 +82,7 @@ namespace mikity.NumericalMethodHelper
             number = new matrixINT(N, N).zeros();
             gravity = new vector(dim).zeros();
             gravity[dim - 1] = 1.0;
+            energyDensity = 0;
         }
         unsafe public void Update()
         {

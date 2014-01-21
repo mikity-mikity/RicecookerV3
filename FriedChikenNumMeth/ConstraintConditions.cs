@@ -37,14 +37,14 @@ namespace mikity.NumericalMethodHelper.objects
         private void initialize()
         {
             elemList = new List<elements.element>();
-            em = new material((_e, _i) => { return _i.stress2.zeros().plus_xA(1.0, _i.invMetric); });
+            em = new material((_e, _i) => { _i.energyDensity = 0; return _i.stress2.zeros().plus_xA(1.0, _i.invMetric); });
             gvt = new materials.zeroGravity().getGravity();
         }
         private void initialize(double objVol)
         {
             this.refVolume = objVol;
             elemList = new List<elements.element>();
-            em = new material((_e, _i) => { return _i.stress2.zeros().plus_xA(1.0, _i.invMetric); });
+            em = new material((_e, _i) => { _i.energyDensity = 0; return _i.stress2.zeros().plus_xA(1.0, _i.invMetric); });
             gvt = new materials.zeroGravity().getGravity();
         }
         public constrainVolumeObject()
