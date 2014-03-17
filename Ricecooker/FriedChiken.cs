@@ -14,7 +14,7 @@ namespace mikity.ghComponents
 
     public class GH_FriedChikenMainLoop : Grasshopper.Kernel.GH_Component
     {
-        public static bool DEV = true;
+        public static bool DEV = false;
         Func<double, double> Drift0 = (v) => { return 0.98; };
         Func<double, double> Drift1 = (v) => { /*if (v > 0)*/ return v / 20d + 0.95; /*else return 0.95;*/ };
 
@@ -720,9 +720,12 @@ namespace mikity.ghComponents
                     {
                         FriedChiken.omega.zeros();
                     }
-                    double resid = FriedChiken.getResidual().norm;
-                    
-                    if (FriedChiken.numCond > 0) phi();
+                    double resid=0;
+                    if (FriedChiken.numCond > 0)
+                    {
+                        resid= FriedChiken.getResidual().norm;
+                        phi();
+                    }
                     string tmp = "\t" + t.ToString() + "\t";
                     tmp += FriedChiken.omega.norm.ToString() + "\t";
 
