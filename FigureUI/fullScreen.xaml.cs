@@ -80,6 +80,9 @@ namespace mikity.visualize
         {
             this.graph2.Clear();
             this.graph3.Clear();
+            this.graph4.Clear();
+            this.graph5.Clear();
+            this.graph6.Clear();
         }
         public void renewPlot(Func<double, double> d)
         {

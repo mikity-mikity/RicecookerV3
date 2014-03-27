@@ -14,7 +14,7 @@ namespace mikity.ghComponents
 
     public class GH_FriedChikenMainLoop : Grasshopper.Kernel.GH_Component
     {
-        public static bool DEV = false;
+        public static bool DEV = true;
         Func<double, double> Drift0 = (v) => { return 0.98; };
         Func<double, double> Drift1 = (v) => { /*if (v > 0)*/ return v / 20d + 0.95; /*else return 0.95;*/ };
 
@@ -72,7 +72,16 @@ namespace mikity.ghComponents
             full.drift1();
             full.renewPlot(Drift1);
             full.onRF();
-            full.onNorm();
+            if (!DEV)
+            {
+                full.onNorm();
+                _normalize = true;
+            }
+            else
+            {
+                full.offNorm();
+                _normalize = false;
+            }
             full.onGeo();
             full.offVN();
             full.offIF();
@@ -124,7 +133,16 @@ namespace mikity.ghComponents
                 full.drift1();
                 full.renewPlot(Drift1);
                 full.onRF();
-                full.onNorm();
+                if (!DEV)
+                {
+                    full.onNorm();
+                    _normalize = true;
+                }
+                else
+                {
+                    full.offNorm();
+                    _normalize = false;
+                }
                 full.onGeo();
                 full.offVN();
                 full.offIF();
@@ -736,6 +754,7 @@ namespace mikity.ghComponents
                     {
                         if(normW!=0)
                             FriedChiken.omega.dividedby(normW);//力を正規化
+                        normW = FriedChiken.omega.norm;
                     }
                     var a = DoubleArray.From(FriedChiken.omega.rawData);
 
@@ -748,11 +767,14 @@ namespace mikity.ghComponents
                     {
                         f = -norm2 / Math.Sqrt(norm1 * norm3);
                     }
-                    else
+                    else if (norm1 == 0)
                     {
                         f = 1;
                     }
-
+                    else
+                    {
+                        f = -1;
+                    }
                     double damping = 0;
                     if (_drift1)
                     {
