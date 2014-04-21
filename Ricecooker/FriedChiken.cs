@@ -15,7 +15,7 @@ namespace mikity.ghComponents
     public class GH_FriedChikenMainLoop : Grasshopper.Kernel.GH_Component
     {
         public static bool DEV = true;
-        Func<double, double> Drift0 = (v) => { return 0.98; };
+        Func<double, double> Drift0 = (v) => { return 0.95; };
         Func<double, double> Drift1 = (v) => { /*if (v > 0)*/ return v / 20d + 0.95; /*else return 0.95;*/ };
 
         Func<double, double> Drift2 = (v) => { if (v >=0)return 1.0; else return 0.0; };
@@ -792,6 +792,7 @@ namespace mikity.ghComponents
                     {
                         damping = Drift0(f);
                     }
+                    //damping = 0;
                     full.move(f);
                     dbg = "damping:" + damping      .ToString() + "\n" + "dt:" + dt.ToString() + "\n" + "Step#:"+t.ToString();
                     full.setDbgText(dbg);
